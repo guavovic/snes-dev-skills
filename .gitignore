@@ -1,0 +1,11 @@
+regras-locais.md
+__pycache__/
+*.pyc
+*.smc
+*.sfc
+*.swc
+*.fig
+*.srm
+*.sav
+*.mss
+*.mst

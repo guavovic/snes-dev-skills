@@ -1,0 +1,16 @@
+{
+  "name": "snes-dev-skills",
+  "description": "Marketplace do snes-dev-skills: skills de desenvolvimento e ROM hacking pra Super Nintendo.",
+  "owner": {
+    "name": "Gustavo Victor",
+    "url": "https://github.com/guavovic"
+  },
+  "plugins": [
+    {
+      "name": "snes-dev-skills",
+      "source": "./",
+      "description": "Skills de hardware, assembly 65816, ROM hacking, desmontagem, gráficos, testes e técnicas da época do Super Nintendo.",
+      "category": "development"
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "name": "snes-dev-skills",
+  "description": "Conhecimento de desenvolvimento pra Super Nintendo: hardware, assembly 65816, ROM hacking, desmontagem, gráficos, testes no emulador e técnicas da época, tudo com fonte.",
+  "author": {
+    "name": "Gustavo Victor",
+    "url": "https://github.com/guavovic"
+  },
+  "homepage": "https://github.com/guavovic/snes-dev-skills",
+  "repository": "https://github.com/guavovic/snes-dev-skills",
+  "license": "MIT",
+  "keywords": ["snes", "super-nintendo", "65816", "rom-hacking", "desmontagem", "retro"]
+}
