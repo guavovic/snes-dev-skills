@@ -48,4 +48,4 @@ ROM hack é patch em cima de uma ROM que você não pode distribuir. O trabalho 
 ## Relação com outras skills
 
 - `snes-assembly`: instruções, M/X, REP/SEP, pilha, ciclos. Esta skill assume que você já lê 65816.
-- Hardware (PPU, DMA, registradores `$21xx`/`$42xx`): skill de hardware do repositório, quando o hack mexe em gráfico ou som.
+- `snes-hardware`: mapa de memória, PPU, DMA, NMI/IRQ, registradores `$21xx`/`$42xx`, quando o hack mexe em gráfico, som ou timing.
