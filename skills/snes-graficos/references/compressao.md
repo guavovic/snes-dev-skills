@@ -15,7 +15,7 @@ O [Lunar Compress] (biblioteca de FuSoYa, v2.00 de 11/11/2025) dá nome e númer
 | LC_LZ19 | Kirby Super Star, Earthbound (gráficos) | versão mais simples do LC_LZ3, usada pela HAL |
 | LC_RLE1 | Super Mario World (dados) | usado nos fundos |
 
-Pro ROM hack do Harvest Moon, o ponto de partida é testar LC_LZ11 nos gráficos. Isso é só o rótulo do catálogo: o formato em si não está descrito em nenhuma fonte lida, então trate como **não confirmado** até achar a rotina de descompressão no trace e comparar.
+Formato marcado só com o nome do jogo no catálogo (como o LC_LZ11) não tem descrição em fonte nenhuma: trate como **não confirmado** até achar a rotina de descompressão no trace e comparar.
 
 Os números dos formatos (ex.: `LC_LZ1 = 0`, `LC_LZ2 = 1`, `LC_LZ11 = 10`, `LC_RLE1 = 100`) vêm do `LunarDLL.def` de uma cópia antiga do código; confira no `.def` da versão que você baixar.
 
