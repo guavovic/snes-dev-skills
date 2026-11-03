@@ -12,7 +12,7 @@ Como os jogos da época resolviam problemas comuns no SNES, com o porquê e um e
 - **snes-assembly**: instruções, ciclos, modos de endereçamento, pilha e interrupções.
 - **snes-rom-hack**: asar, espaço livre e hooks quando a técnica entra numa ROM existente.
 
-Toda afirmação técnica tem fonte entre colchetes (`[SNESdev wiki]`, `[fullsnes]`...), listadas em [references/fontes.md](references/fontes.md) com as divergências. Os exemplos são originais e **não foram montados** (não havia asar na máquina de quem escreveu); confira antes de usar.
+Toda afirmação técnica tem fonte entre colchetes (`[SNESdev wiki]`, `[fullsnes]`...), listadas em [references/fontes.md](references/fontes.md) com as divergências. Os exemplos são originais, montados no asar 1.91 e conferidos no Mesen 2.2.1 em 02/11/2026 [Teste local].
 
 ## Visão geral
 
@@ -31,7 +31,7 @@ Toda afirmação técnica tem fonte entre colchetes (`[SNESdev wiki]`, `[fullsne
 5. **Tabela de HDMA que muda precisa de buffer duplo**, e HDMAEN só se liga no vblank [SNESdev wiki: HDMA examples].
 6. **Canal de HDMA não serve para DMA geral no mesmo quadro**, e o HDMA tem prioridade sobre o DMA [fullsnes][SNESdev wiki].
 7. **Fade é brilho, mas o fim é force blank:** brilho 0 ainda não é preto garantido; termine com `$80` em INIDISP [fullsnes][undisbeliever].
-8. **Meça o tempo do quadro** antes de otimizar: contador de lag na NMI [SNESdev wiki: VBlank routine]; o resto do método está em [references/estrutura-do-jogo.md](references/estrutura-do-jogo.md).
+8. **Meça o tempo do quadro** antes de otimizar: contador de lag na NMI [SNESdev wiki: VBlank routine] e a cor fixa pintando o fundo quando a lógica termina [NESdev BBS: CPU usage meter][OpenSNES: profile.h]; o resto do método está em [references/estrutura-do-jogo.md](references/estrutura-do-jogo.md).
 
 ## Armadilhas
 
@@ -52,6 +52,6 @@ Toda afirmação técnica tem fonte entre colchetes (`[SNESdev wiki]`, `[fullsne
 | [cor-e-transicoes.md](references/cor-e-transicoes.md) | Color math (transparência, sombra, névoa, tinta), escurecer fora da janela, paleta de hora do dia e estação, fade de brilho, mosaico |
 | [streaming-e-scroll.md](references/streaming-e-scroll.md) | Paralaxe com vários BGs, mapa maior que a VRAM, coluna e linha de tilemap por DMA, streaming de tiles |
 | [chips-especiais.md](references/chips-especiais.md) | Quando a época usou chip: SA-1, Super FX, DSP-n, CX4, S-DD1, SPC7110, OBC1, com jogos de exemplo |
-| [desenvolvedores.md](references/desenvolvedores.md) | O que os desenvolvedores contaram em entrevistas (Super Mario Kart, Star Fox, Super Metroid) e o que não foi achado em japonês |
-| [exemplos.md](references/exemplos.md) | Código original em asar: NMI com flag, fila de DMA, controle, gradiente, onda, foco de luz, fade |
+| [desenvolvedores.md](references/desenvolvedores.md) | O que os desenvolvedores contaram em entrevistas (Super Mario Kart, Star Fox, Super Metroid, F-ZERO em japonês) |
+| [exemplos.md](references/exemplos.md) | Código original em asar, testado no Mesen: NMI com flag, fila de DMA, controle, onda, foco de luz, fade de saída, fade para branco, Mode 7 com padrão 3, medidor do quadro |
 | [fontes.md](references/fontes.md) | Fontes, confiança, divergências e o que ficou de fora |

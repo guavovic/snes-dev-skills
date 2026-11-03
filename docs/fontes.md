@@ -32,6 +32,11 @@ Documentos usados nas skills, com o que cada um cobre e o quanto é confiável. 
 | [Lunar Compress](https://fusoya.eludevisibility.org/lc/index.html) | FuSoYa | Catálogo de formatos de compressão e os números da DLL, conferidos no pacote oficial v2.00 | Alta |
 | [sfc-comp](https://github.com/sfc-comp/sfc-comp) | sfc-comp (MIT) | Compressores de jogos de SNES reimplementados: LC_LZ11 e variantes de LZSS | Média/alta |
 | [YY-CHR @wiki](https://w.atwiki.jp/yychr/) | YY | Página oficial do YY-CHR, em japonês: versão e formatos | Alta |
+| [Entrevistas de 2017 da Nintendo JP](https://web.archive.org/web/20191213044242/https://topics.nintendo.co.jp/c/article/0e9c42d3-7d8a-11e7-8cda-063b7ac45a6d.html) | Nintendo | Relato em japonês das equipes de F-ZERO e Super Mario Kart sobre o Mode 7, lido em cópia do Internet Archive | Alta pro relato |
+| [SNES CPU usage meter](https://nesdev.nes.science/f12/t12419.xhtml) | fórum NESdev, 2015 | Medir o tempo do quadro pela cor de fundo ou pela linha atual | Média |
+| [OpenSNES: profile.h](https://k0b3n4irb.github.io/opensnes/profile_8h.html) | projeto OpenSNES | Medidor de quadro com a cor fixa no backdrop | Média |
+| [sneslab](https://sneslab.net/wiki/) | comunidade sneslab | Uso dos canais de DMA em Super Mario World e gráficos dinâmicos | Média |
+| [Using DMA effectively](https://wiki.superfamicom.org/using-dma-effectively) | comunidade superfamicom.org | Streaming de quadros de animação com limite por quadro | Média |
 
 ## Por skill
 

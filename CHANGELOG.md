@@ -8,6 +8,7 @@
 - **snes-hardware**: exemplos montados no asar e rodados no Mesen (tabela de vetores corrigida); HDMA ligado no meio do quadro, janela da CGRAM, force blank no meio da linha, offset-per-tile e Y e X para esconder OBJ documentados com código de emulador e teste próprio; datas das fontes conferidas.
 - **snes-rom-hack**: projeto mínimo montado no asar 1.91 e rodado no Mesen, checksum de tamanho irregular comparado entre asar, Snes9x e SNESdev, ExLoROM e SRAM conferidos no código do Mesen, Snes9x e FXPAK, regras de envio oficiais do SMW Central e organização do z3randomizer como referência.
 - **snes-desmontagem**: CDL do Mesen conferido rodando (operando marcado como código), motivo de o DiztinGUIsh não importá-lo e caminho de conversão, sintaxe da condição do trace logger lida no código, Capstone avaliado contra ROM própria e guiado pelo CDL, e a desmontagem do Super Metroid que monta (InsaneFirebat) conferida.
+- **snes-tecnicas**: exemplos montados no asar 1.91 e conferidos no Mesen (fade de saída corrigido), exemplos novos de fade para branco, Mode 7 com padrão 3 e medidor do quadro, streaming de animação com caso documentado e relato em japonês das entrevistas de F-ZERO e Super Mario Kart.
 
 ## v0.1
 
