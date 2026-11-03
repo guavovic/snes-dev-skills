@@ -1,6 +1,6 @@
 ---
 name: snes-desmontagem
-description: Desmontagem e engenharia reversa de ROM de Super Nintendo (SNES / Super Famicom) para entender o código e preparar um hack. Use quando a tarefa envolver separar código de dado (trace log, Code/Data Logger do Mesen, arquivo CDL, usage map), escolher ferramenta (debugger do Mesen 2 / MesenCE, bsnes-plus, DiztinGUIsh, Ghidra com plugin 65816, desmontador de linha de comando), acompanhar o estado das flags M e X do 65816 durante a desmontagem, achar uma variável na RAM (busca por valor, breakpoint de escrita, quem lê e quem escreve), dar nome a rotina, tabela de ponteiros, jump table e tabela de caracteres de texto (arquivo .tbl), importar ou exportar labels (.mlb, .sym), documentar mapa de RAM e de ROM ou organizar um projeto de desmontagem byte a byte (no estilo das desmontagens de Super Mario World, Zelda: A Link to the Past, Super Metroid, EarthBound e dos projetos pret). Também serve para perguntas como "onde fica a vida do jogador na RAM", "por que o desmontador mostrou lixo depois desse REP", "como acho quem escreve nesse endereço", "como monto uma tabela de texto" ou "como organizo o repositório da desmontagem".
+description: Desmontagem e engenharia reversa de ROM de Super Nintendo (SNES / Super Famicom) para entender o código e preparar um hack. Use quando a tarefa envolver separar código de dado (trace log, Code/Data Logger do Mesen, arquivo CDL, usage map), escolher ferramenta (debugger do Mesen 2 / MesenCE, bsnes-plus, DiztinGUIsh, Ghidra com plugin 65816, desmontador de linha de comando como o Capstone), escrever a condição do trace logger do Mesen, acompanhar o estado das flags M e X do 65816 durante a desmontagem, achar uma variável na RAM (busca por valor, breakpoint de escrita, quem lê e quem escreve), dar nome a rotina, tabela de ponteiros, jump table e tabela de caracteres de texto (arquivo .tbl), importar ou exportar labels (.mlb, .sym), documentar mapa de RAM e de ROM ou organizar um projeto de desmontagem byte a byte (no estilo das desmontagens de Super Mario World, Zelda: A Link to the Past, Super Metroid, EarthBound e dos projetos pret). Também serve para perguntas como "onde fica a vida do jogador na RAM", "por que o desmontador mostrou lixo depois desse REP", "como acho quem escreve nesse endereço", "como monto uma tabela de texto" ou "como organizo o repositório da desmontagem".
 ---
 
 # snes-desmontagem
@@ -11,7 +11,7 @@ Como transformar bytes de uma ROM em código entendido e nomeado. Este arquivo t
 
 1. **Rodar e registrar.** Jogue a parte que interessa com o Code/Data Logger do Mesen ligado (ou o usage map do bsnes-plus). O que executou vira código, o que foi lido vira dado, e no SNES o Mesen ainda grava o estado de M e X de cada byte executado [MesenCE src]. Ver `references/codigo-e-dados.md`.
 2. **Achar o ponto de entrada.** Busca de valor na RAM, breakpoint de escrita, trace log em volta do momento certo [MesenCE src][bsnes-plus]. Ver `references/variaveis-e-tabelas.md`.
-3. **Desmontar com estado.** Importe o CDL ou o trace num desmontador que acompanha M, X, DB e D (DiztinGUIsh faz isso) [DiztinGUIsh]. Ver `references/ferramentas.md`.
+3. **Desmontar com estado.** Leve o estado registrado para um desmontador que acompanha M, X, DB e D: o DiztinGUIsh importa usage map e trace do bsnes e CDL do BizHawk, mas não o CDL do Mesen [DiztinGUIsh src]; com o CDL do Mesen, um script com o Capstone escolhe o modo certo por instrução [Teste local]. Ver `references/ferramentas.md`.
 4. **Nomear e documentar.** Labels de RAM e ROM num arquivo que volta pro debugger (.mlb, .sym), mapa de RAM em texto, tabela de caracteres em .tbl [MesenCE src][Data Crystal TBL]. Ver `references/organizacao-de-projetos.md`.
 
 ## Regras de ouro
@@ -32,14 +32,16 @@ Como transformar bytes de uma ROM em código entendido e nomeado. Este arquivo t
 - **Jump table indexada.** `JMP (abs,X)` e `JSR (abs,X)` pulam pra endereços que nenhum desmontador linear segue. Marque a tabela como ponteiros e crie labels em cada destino. Ver `references/variaveis-e-tabelas.md`.
 - **CDL de outra versão da ROM.** O arquivo CDL do Mesen guarda o CRC32 da ROM; arquivo sem CRC (formato antigo) carrega só com aviso [MesenCE src]. Revisão diferente do jogo muda endereços.
 - **Leitura que tem efeito colateral.** Ler registrador de hardware num script ou janela de memória pode mudar o estado. No Lua do Mesen, os tipos `*Debug` (por exemplo `emu.memType.snesDebug`) leem sem efeito colateral [MesenCE src].
+- **CDL do Mesen não abre no DiztinGUIsh.** Formato e flags são outros, e o Mesen marca operando com a mesma flag do opcode; é preciso converter [DiztinGUIsh src][Teste local].
+- **Condição do trace com número sem `$`.** No Mesen número sem prefixo é decimal, e condição inválida é descartada: o trace grava tudo [MesenCE src]. Sintaxe em `references/codigo-e-dados.md`.
 - **Tabela .tbl com código de controle.** Cada ferramenta escreve códigos de controle de um jeito; o Mesen só carrega entradas simples `HEX=texto` [Data Crystal TBL][MesenCE src].
 
 ## Índice de referências
 
 | Arquivo | O que tem |
 |---|---|
-| `references/ferramentas.md` | Mesen 2 / MesenCE, bsnes-plus, DiztinGUIsh, Ghidra (ghidra-65816, ghidra-snes), desmontadores de linha de comando: o que cada um faz bem e seus limites |
-| `references/codigo-e-dados.md` | CDL do Mesen (flags, formato do arquivo, Generate ROM), trace logger e formato, usage map do bsnes-plus, como acompanhar M e X |
+| `references/ferramentas.md` | Mesen 2 / MesenCE, bsnes-plus, DiztinGUIsh (e por que o CDL do Mesen não importa direto), Ghidra (ghidra-65816, ghidra-snes), desmontadores de linha de comando e o Capstone testado: o que cada um faz bem e seus limites |
+| `references/codigo-e-dados.md` | CDL do Mesen (flags, formato do arquivo, Generate ROM), trace logger, formato e sintaxe da condição, usage map do bsnes-plus, como acompanhar M e X |
 | `references/variaveis-e-tabelas.md` | Busca de valor na RAM, breakpoints de leitura e escrita, contadores de acesso, callback de memória em Lua, tabelas de ponteiros, jump tables, tabelas de texto .tbl |
 | `references/organizacao-de-projetos.md` | Labels (.mlb, .sym), mapa de RAM e de ROM, como se organizam as desmontagens de SMW, ALttP, Super Metroid, EarthBound e o estilo pret |
 | `references/fontes.md` | Fontes, confiança, divergências e o que não foi confirmado |

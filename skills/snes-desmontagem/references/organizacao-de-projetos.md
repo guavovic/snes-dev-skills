@@ -57,7 +57,12 @@ Versão japonesa 1.0, licença GPL-3.0, montador Futaba [jpdasm].
 ### Super Metroid
 
 - Logs anotados por banco no site do PJBoy, com mapas de memória, que servem de documentação mas não montam [PJ bank logs].
-- A mesma página aponta uma versão reassemblável mantida por outra pessoa (InsaneFirebat), não conferida nesta pesquisa (não confirmado).
+- A mesma página aponta uma versão que monta, de InsaneFirebat: o repositório `InsaneFirebat/sm_disassembly` existe, é público, licença 0BSD, criado em 06/01/2025 e com push em 05/10/2026 (conferido em 02/11/2026) [sm_disassembly]. Só a estrutura e o README foram lidos, nenhum código do jogo:
+  - Se descreve como desmontagem relocável baseada nos logs do PJBoy, feita originalmente no DiztinGUIsh (o projeto `.diz` e os labels em CSV ficam numa pasta `diztinguish/`).
+  - Monta com asar 1.81. Pastas `src/` (um `bank_XX.asm` por banco), `data/` vazia no git e `tools/` com scripts Python.
+  - Os dados vêm da ROM NTSC sem cabeçalho do próprio usuário, extraídos por script (há uma variante para PAL).
+  - O script de teste monta e compara byte a byte com a ROM original (`fc /B` no Windows).
+  - Os comentários vêm em boa parte dos logs do PJBoy, com permissão, segundo o próprio projeto.
 
 ### EarthBound: ebsrc
 
