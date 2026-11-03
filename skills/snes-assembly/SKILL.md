@@ -17,7 +17,7 @@ O 65816 é um 6502 estendido pra 16 bits e 24 bits de endereço. No SNES ele rod
 6. **`SEP #$10` zera XH e YH** e o valor alto não volta.
 7. **`JSL` volta com `RTL`, `JSR` volta com `RTS`.** Pulo pra outro banco é `JML`. O PC não atravessa banco.
 8. **D alinhado em $xx00**: DL diferente de zero custa 1 ciclo em todo acesso direct. Se mudar D, `PHD`/`PLD`.
-9. **No asar, `MVN destino,origem`** (ao contrário do padrão WDC e do ca65). C = bytes - 1, e no fim DB = banco de destino.
+9. **No asar, `MVN destino,origem`** (ao contrário do padrão WDC, do ca65 e do WLA-DX). C = bytes - 1, e no fim DB = banco de destino.
 10. **Endereço, bit e ciclo vêm das tabelas dos references**, nunca de memória.
 
 ## Entrada no modo nativo (boot)
@@ -69,5 +69,7 @@ O 65816 é um 6502 estendido pra 16 bits e 24 bits de endereço. No SNES ele rod
 | Ciclos no SNES, FastROM, D alinhado, truques de velocidade | `references/desempenho.md` |
 | Armadilhas com sintoma e conserto, tabela asar x ca65 x WLA-DX | `references/armadilhas.md` |
 | De onde veio cada fato, divergências entre fontes | `references/fontes.md` |
+
+Os blocos de código desta skill e dos references foram montados no asar 1.91 em 02/11/2026; o de MVN também rodou no Mesen 2.
 
 Para desmontar uma rotina: ache o opcode em `instrucoes.md` (busque `$A9`), acompanhe REP/SEP/PLP pra saber o tamanho dos imediatos e anote DB e D antes de interpretar endereços.

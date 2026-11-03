@@ -1,6 +1,6 @@
 # Fontes da skill snes-assembly
 
-Pesquisa feita em 26/10/2026. Cada fato de registrador, bit, ciclo ou endereço foi conferido em pelo menos duas fontes da lista; quando não deu, está marcado "não confirmado" no texto.
+Pesquisa feita em 26/10/2026. Cada fato de registrador, bit, ciclo ou endereço foi conferido em pelo menos duas fontes da lista; quando não deu, está marcado "não confirmado" no texto. Revisão de 02/11/2026: WLA-DX conferido no código, livro de Eyes e Lichty, tutorial de interrupções do 6502.org, temporização no código do bsnes, e todos os exemplos montados no asar 1.91 (o de MVN também rodado no Mesen 2).
 
 | Nome | Fonte | Autor / ano | Cobre | Confiança |
 |---|---|---|---|---|
@@ -12,13 +12,19 @@ Pesquisa feita em 26/10/2026. Cada fato de registrador, bit, ciclo ou endereço 
 | [ca65] | ca65 Users Guide, https://cc65.github.io/doc/ca65.html | projeto cc65 | `.a8/.a16/.i8/.i16`, `.smart`, prefixos `z:/a:/f:`, MVN, BRK, apelidos | Alta para o ca65 |
 | [WLA-DX] | Documentação em https://github.com/vhelin/wla-dx/tree/master/doc (`asmsyntax.rst`, `asmdiv.rst`) | Ville Helin e colaboradores | Sufixos `.b/.w/.l` no operando, `.ACCU`, `.INDEX` | Média: só os pontos citados foram lidos |
 | [Mesen2] | `Core/SNES/SnesCpu.Instructions.h`, https://github.com/SourMesen/Mesen2 | Sour (Mesen) | Desempate: banco do ponteiro de JMP (a,x), MVN, sequência de interrupção, vetor BRK em emulação | Alta (emulador de alta precisão) |
+| [WLA-DX código] | `wla-65816` no commit ef73ebe: tabela `i65816.c`, `decode.c`, `phase_4.c` e testes `tests/65816/all_instructions_test`, https://github.com/vhelin/wla-dx | Ville Helin e colaboradores | Ordem do MVN, pulo long, BRK, apelidos, bytes do `.ACCU 16` | Alta para o WLA-DX; lido, não executado (o binário não rodou neste ambiente) |
+| [E&L] | "Programming the 65816, Including the 65C02 and 65802", scan em https://archive.org/details/0893037893ProgrammingThe65816 | David Eyes e Ron Lichty, 1986 | MVN/MVP (sintaxe, interrupção no meio, DB), tabela de apelidos padrão, `JMP >` long | Alta: livro de referência feito com a WDC; o texto vem de OCR, e a sneslab.net/wiki/Eyes_%26_Lichty lista errata do PDF antigo |
+| [6502.org int] | "Investigating 65C816 Interrupts", http://6502.org/tutorials/65c816interrupts.html (lido via web.archive.org) | BCS Technology (BigDumbDinosaur), 1994-2015 | Ciclos da entrada na interrupção, latência, `WAI` com `SEI` | Alta: tutorial revisado do 6502.org, só modo nativo |
+| [bsnes] | `bsnes/sfc/cpu/timing.cpp`, `irq.cpp`, `cpu.cpp`, `io.cpp`, commit 78474e5d, https://github.com/bsnes-emu/bsnes | byuu (Near) e colaboradores | Refresh da DRAM, ponto do NMI e do H-IRQ, teste de interrupção no penúltimo ciclo, `irqLock`, `WAI` | Alta (emulador de precisão de ciclo) |
+| [Anomie timing] | "Timing", https://wiki.superfamicom.org/timing | anomie | Refresh, NMI, H-IRQ, saída do `WAI` | Média: o próprio texto marca parte como teoria; bate com o [bsnes] |
+| [SNESdev timing] | "Timing", https://snes.nesdev.org/wiki/Timing | comunidade SNESdev | Clocks por linha, refresh de 40 clocks | Alta |
+| asar 1.91 (teste) | Montagem real dos exemplos e da coluna de sintaxe da tabela de instruções, numa ROM vazia própria | este repositório, 02/11/2026 | Bytes gerados, avisos, apelidos, `autoclean` | Alta para o asar 1.91 |
 
 ## Não consultadas
 
-- "Programming the 65816" (David Eyes e Ron Lichty, 1986): não está disponível livremente; nenhum fato desta skill depende só dele.
-- Primer de 65816 do 6502.org além do "65C816 Opcodes": não lido nesta rodada.
-- Fontes em japonês (ex.: 65816 アセンブラ): não pesquisadas nesta rodada.
-- Código do bsnes/higan: não foi preciso, o [Mesen2] resolveu os desempates.
+- Fontes em japonês: buscadas em 02/11/2026 (65816 命令表, サイクル, スーパーファミコン アセンブラ, Wikipédia japonesa). Só apareceu o verbete geral "65816 (コンピュータ)" e páginas que repetem material em inglês; nenhuma fonte técnica primária em japonês de acesso livre. Descartado.
+- Um "primer" de 65816 no 6502.org: não existe com esse nome. O que o site tem são o "65C816 Opcodes" [Clark] e o tutorial de interrupções [6502.org int], os dois usados aqui.
+- Execução do WLA-DX: o binário não pôde rodar neste ambiente; os fatos vêm do código e dos testes do repositório deles.
 
 ## Divergências registradas
 
@@ -31,4 +37,7 @@ Pesquisa feita em 26/10/2026. Cada fato de registrador, bit, ciclo ou endereço 
 | Ciclos do MVN/MVP | [SFC wiki]: célula corrompida | [Clark], [fullsnes], [Mesen2]: 7 por byte | 7 por byte |
 | Parada do MVN/MVP | [WDC 3.5.9] simplifica ("decrementa C se maior que zero") | [Clark], [fullsnes], [Mesen2]: repete até C=$FFFF | até C=$FFFF (move C+1 bytes) |
 | Ordem dos operandos do MVN | [WDC], [ca65]: origem, destino | [asar]: destino, origem | Depende do montador; bytes de máquina sempre `op dst src` |
-| Bytes do exemplo `.ACCU 16` | [WLA-DX] mostra `$29 $00 $06` | little-endian daria `$29 $06 $00` | Provável erro da documentação; não confirmado |
+| Bytes do exemplo `.ACCU 16` | [WLA-DX] `asmdiv.rst` mostra `$29 $00 $06` | [WLA-DX código] `phase_4.c` grava em little-endian: `$29 $06 $00` | Erro da documentação deles |
+| Ordem do MVN no WLA-DX | (não havia fonte) | [WLA-DX código] teste `mvn $12,$34` = `54 34 12` | origem, destino, como WDC e ca65 |
+| Posição do refresh da DRAM na linha | [Anomie timing]: ~536, o primeiro em 538, "teoria" | [bsnes]: 530 na CPU rev. 1, 538 na rev. 2 | Depende da revisão; os 40 clocks batem em todas |
+| `COP` sem operando | [asar] 1.91 testado: `02 00` | [WLA-DX código]: valor $0200 na tabela, possível `00 02` | Não confirmado no WLA-DX; escrever sempre `COP $xx` |
