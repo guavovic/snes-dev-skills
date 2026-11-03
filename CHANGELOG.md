@@ -1,5 +1,9 @@
 # Mudanças
 
+## [Não lançado]
+
+- **snes-tecnicas**: paleta de hora do dia e estação com caso documentado (Harvest Moon, pela desmontagem e pelo guia da reimplementação em C) e exemplo novo em asar, testado no Mesen, que leva a paleta até a alvo um passo por canal, em fatias por quadro.
+
 ## v0.2
 
 Revisão das sete skills: todos os exemplos em asar foram montados no asar 1.91 e rodados no Mesen 2.2.1 com ROM própria, as pendências da v0.1 foram conferidas no código dos emuladores e em fonte oficial, e o que não fechou foi para issues com o marco v0.3.

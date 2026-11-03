@@ -49,9 +49,9 @@ Toda afirmação técnica tem fonte entre colchetes (`[SNESdev wiki]`, `[fullsne
 |---|---|
 | [estrutura-do-jogo.md](references/estrutura-do-jogo.md) | Init seguro, reset de registradores por cena, laço principal, NMI, flag de quadro, fila de DMA, OAM shadow e tabela alta, controle, atores e máquina de estados, orçamento e lag, vblank estendido |
 | [hdma-efeitos.md](references/hdma-efeitos.md) | Degradê, ondulação de água e calor, paralaxe por faixa, perspectiva de Mode 7, janela em círculo (foco de luz), cortina de caixa de texto |
-| [cor-e-transicoes.md](references/cor-e-transicoes.md) | Color math (transparência, sombra, névoa, tinta), escurecer fora da janela, paleta de hora do dia e estação, fade de brilho, mosaico |
+| [cor-e-transicoes.md](references/cor-e-transicoes.md) | Color math (transparência, sombra, névoa, tinta), escurecer fora da janela, paleta de hora do dia e estação (com o caso do Harvest Moon), fade de brilho, mosaico |
 | [streaming-e-scroll.md](references/streaming-e-scroll.md) | Paralaxe com vários BGs, mapa maior que a VRAM, coluna e linha de tilemap por DMA, streaming de tiles |
 | [chips-especiais.md](references/chips-especiais.md) | Quando a época usou chip: SA-1, Super FX, DSP-n, CX4, S-DD1, SPC7110, OBC1, com jogos de exemplo |
 | [desenvolvedores.md](references/desenvolvedores.md) | O que os desenvolvedores contaram em entrevistas (Super Mario Kart, Star Fox, Super Metroid, F-ZERO em japonês) |
-| [exemplos.md](references/exemplos.md) | Código original em asar, testado no Mesen: NMI com flag, fila de DMA, controle, onda, foco de luz, fade de saída, fade para branco, Mode 7 com padrão 3, medidor do quadro |
+| [exemplos.md](references/exemplos.md) | Código original em asar, testado no Mesen: NMI com flag, fila de DMA, controle, onda, foco de luz, fade de saída, fade para branco, paleta de hora do dia, Mode 7 com padrão 3, medidor do quadro |
 | [fontes.md](references/fontes.md) | Fontes, confiança, divergências e o que ficou de fora |

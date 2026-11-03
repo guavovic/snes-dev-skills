@@ -33,11 +33,23 @@ Técnica: guardar a paleta "de base" na ROM e uma cópia de trabalho da CGRAM (5
 
 - Cada cor é BGR555: 5 bits por canal [SNESdev wiki: CGRAM]. Para escurecer ou tingir, separe os canais, aplique a regra a cada um (multiplicar por um fator, somar um tom e limitar em 0-31, ou interpolar até uma paleta alvo) e junte de novo.
 - Interpolar entre duas paletas prontas (dia e noite, verão e inverno) dá mais controle artístico do que uma fórmula: o artista escolhe as cores de cada momento e o código só faz a transição em alguns quadros.
-- Recalcular 256 cores em um quadro pesa na CPU; espalhe por vários quadros (algumas paletas por quadro) e suba só as paletas que mudaram.
+- Recalcular 256 cores em um quadro pesa na CPU: no Mesen, um passo por canal nas 256 cores custou mais de um quadro [Teste local]. Espalhe por vários quadros (algumas paletas por quadro) e suba só as paletas que mudaram.
 - Alternativa sem recalcular: tinta por color math com a cor fixa (seção anterior), barata e global, mas afeta tudo por igual e esbarra nos limites do color math.
 - Estação também pode trocar tiles (neve no chão, folhas), por streaming (ver [streaming-e-scroll.md](streaming-e-scroll.md)).
 
-Quais jogos da época usavam cada caminho para hora do dia ou estação **não foi confirmado** em fonte técnica; fica como técnica, sem atribuir a jogo. A busca de 02/11/2026 achou a técnica descrita (tinta por cor fixa, degradê de COLDATA por HDMA [SNESdev wiki: Color math]) e tabelas de paleta separadas por cenário em mapas de ROM de fãs, mas nenhum texto que explique o caminho de um jogo para a passagem do tempo.
+### Caso documentado: Harvest Moon
+
+A desmontagem aberta do Harvest Moon (HM-Decomp) e o guia da reimplementação em C que parte dela (HarvestMoonSnesDecomp, conferida contra o jogo byte a byte) descrevem o caminho do jogo para a hora do dia [HM-Decomp][HarvestMoonSnesDecomp: GUIDE]. Resumo com as nossas palavras, sem código do jogo:
+
+- **Uma paleta pronta por parte do dia, por mapa.** Uma tabela na ROM (`$80:BB5C`) dá a cada mapa uma paleta para cada faixa de hora (antes das 7h, 7h-14h59, 15h-16h59, 17h-17h59 e das 18h em diante); um valor reservado diz "mantém a que está", o que deixa os interiores sem mudança [HarvestMoonSnesDecomp: GUIDE]. A tabela aparece com o nome `Time_Palette_Table` no mapa de bancos do HM-Decomp [HM-Decomp].
+- **Três cópias na WRAM:** a que vai para a CGRAM, uma em preparo (a da noite) e a que está na tela [HarvestMoonSnesDecomp: GUIDE].
+- **Transição lenta por passos, não fórmula.** Quando a hora entra em outra faixa, o jogo aponta a paleta alvo; uma rotina que roda todo quadro, a cada 32 quadros, move cada cor um passo em vermelho, verde e azul na direção do alvo e manda a cópia por DMA. Quando nenhuma cor muda, a transição acabou. A troca inteira pode levar 31 x 32 quadros, uns 16 segundos [HarvestMoonSnesDecomp: GUIDE]. O HM-Decomp chama essas rotinas de `SetTimeofDayPalette` e `TransitionTimeofDayPalettes` e tem na RAM um contador de troca de paleta (`$7E:017A`) [HM-Decomp].
+- **Nem tudo escurece.** Antes das 18h só a metade dos BGs muda; a partir das 18h, a dos sprites também, com uma paleta de sprites de noite por mapa. As primeiras cores, que parecem ser as da caixa de texto, ficam de fora [HarvestMoonSnesDecomp: GUIDE].
+- **Estação é outro mapa.** A fazenda tem um mapa por estação (mapas 0 a 3), e só três cores de uma paleta de sprites mudam com a estação [HarvestMoonSnesDecomp: GUIDE]. Ou seja, a estação troca tiles e paleta junto com o mapa, enquanto a hora do dia troca só a paleta.
+
+As duas fontes não são independentes: o guia parte da desmontagem e credita os nomes a ela. O que dá peso ao guia é a verificação byte a byte da reimplementação contra o jogo [HarvestMoonSnesDecomp: README]. Não houve conferência própria na ROM, porque a regra do repositório não usa jogo comercial. O exemplo de [exemplos.md](exemplos.md) segue o mesmo caminho com código nosso, testado no Mesen [Teste local].
+
+Para outros jogos com dia e noite, não foi achado texto técnico: em Breath of Fire II só há a descrição de um código de trapaça (um valor de hora de `$00` a `$7F` no mapa do mundo) e paletas extraídas por fãs para cada momento entre dia e noite, o que mostra o efeito mas não o caminho [VG Resource: Breath of Fire 2].
 
 ## Fade de brilho
 

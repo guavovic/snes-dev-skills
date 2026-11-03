@@ -24,6 +24,7 @@ Consultadas em 26/10/2026; as da v0.2 em 02/11/2026. No texto, cada afirmação 
 | [Dizworld] | https://github.com/bbbradsmith/SNES_stuff/tree/main/dizworld | Brad Smith (CC BY 4.0) | consultado em 2026 | Perspectiva de Mode 7 por HDMA gerada pela CPU a 60 quadros, horizonte | Alta: código aberto que roda em hardware |
 | [Clark] | http://www.6502.org/tutorials/65c816opcodes.html | Bruce Clark, 6502.org | revisão consultada em 2026 | `JSR (abs,X)` e transferências entre registradores de tamanhos diferentes | Alta (também fonte da snes-assembly) |
 | [Mesen2] | https://github.com/SourMesen/Mesen2 | Sour | código consultado em 2026 | Banco do ponteiro de `JSR (abs,X)` | Alta (desempate, ver snes-assembly) |
+| Independência das fontes do Harvest Moon | [HarvestMoonSnesDecomp: GUIDE] descreve a transição | [HM-Decomp] só dá nomes e endereços, e o guia parte dele | As duas batem (tabela em `$80:BB5C`, rotinas de troca por hora); vale o guia, pela verificação byte a byte [HarvestMoonSnesDecomp: README], registrado que não são independentes |
 | [Iwata Asks: Mario Kart Wii] | https://iwataasks.nintendo.com/interviews/wii/mariokart/0/0 | Nintendo (Satoru Iwata com a equipe) | 2008 | Origem de Super Mario Kart, tela de dois jogadores, personagens em vários ângulos por falta de memória | Alta para o relato; é memória de desenvolvedor, não documento técnico |
 | [entrevista SNES Classic: Star Fox] | https://www.nintendo.com/en-gb/News/2017/September/Nintendo-Classic-Mini-SNES-developer-interview-Volume-1-Star-Fox-Star-Fox-2-1273086.html | Nintendo, com Miyamoto, Imamura e Watanabe | 2017 | Super FX, "Super NES isn't polygon hardware", custo por vértice, tempo do chip, Super FX 2 | Alta para o relato |
 | [GameBusiness.jp: Super Metroid] | https://www.gamebusiness.jp/article/2017/09/16/13439.html | GameBusiness.jp | 16/09/2017 | Primeiro ano de Super Metroid gasto pesquisando o hardware | Média: imprensa, em japonês |
@@ -36,7 +37,11 @@ Consultadas em 26/10/2026; as da v0.2 em 02/11/2026. No texto, cada afirmação 
 | [sneslab: DMA channel usage in SMW] | https://sneslab.net/wiki/DMA_channel_usage_in_SMW | comunidade sneslab | consultada em 2026 | Canal 2 de DMA sobe os gráficos do jogador em Super Mario World | Média: documentação de fãs a partir da desmontagem |
 | [sneslab: Dynamic X] | https://sneslab.net/wiki/Dynamic_X | comunidade sneslab | consultada em 2026 | O jogo original sobe gráficos do jogador, Yoshi e podoboos sempre; a biblioteca só quando precisa | Média: documentação de fãs |
 | [Superfamicom wiki: Using DMA effectively] | https://wiki.superfamicom.org/using-dma-effectively | comunidade superfamicom.org | consultada em 2026 | Comparar quadro pedido com o carregado, animação a 30 quadros, limite de DMA por quadro | Média: wiki técnica sem autor |
-| [Teste local] | Montagem no asar 1.91 e execução no Mesen 2.2.1 (`--testRunner`, ROM vazia própria, scripts Lua) | feito para esta skill | 02/11/2026 | Todos os trechos de exemplos.md, o bug do fade de saída e a conta da esquerda para a direita do asar | Alta para o comportamento no emulador; não é hardware real |
+| [HM-Decomp] | https://github.com/ElisaS-Codes/HM-Decomp (`BankMap.txt` e `RamMap.txt`) | ElisaS-Codes e DasK | 2023-2024 | Nomes e endereços das rotinas e da tabela de paleta por hora do dia e do contador de troca de paleta no Harvest Moon | Média: desmontagem de fãs, rotinas marcadas como entendidas; só os mapas de texto foram lidos, não o código |
+| [HarvestMoonSnesDecomp: GUIDE] | https://github.com/RodoLy/HarvestMoonSnesDecomp/blob/main/GUIDE.md (seções 5.2, 5.11 e 5.19) | Rodrigo (RodriLoy) | versão de 02/11/2026 | Faixas de hora com paleta por mapa, três cópias na WRAM, passo de um por canal a cada 32 quadros, metade dos BGs e dos sprites, mapa por estação | Média/alta: guia de uma reimplementação conferida contra o jogo; parte do HM-Decomp, então não é fonte independente |
+| [HarvestMoonSnesDecomp: README] | https://github.com/RodoLy/HarvestMoonSnesDecomp/blob/main/README.md | Rodrigo (RodriLoy) | versão de 02/11/2026 | Método de verificação: cada rotina comparada com o jogo (memória, registradores da CPU e do DMA) | Média/alta |
+| [VG Resource: Breath of Fire 2] | https://www.vg-resource.com/thread-43428.html (lido na cópia do Internet Archive de 16/04/2025) | fórum The VG Resource, tópico de 27/02/2025 | 2025 | Código de trapaça de "sempre dia" no mapa do mundo, faixa de valores da hora, paletas extraídas entre dia e noite | Baixa: observação de quem fez a trapaça, sem explicar o código |
+| [Teste local] | Montagem no asar 1.91 e execução no Mesen 2.2.1 (`--testRunner`, ROM vazia própria, scripts Lua) | feito para esta skill | 02/11/2026 e 03/11/2026 | Todos os trechos de exemplos.md, o bug do fade de saída, a conta da esquerda para a direita do asar e o custo do passo de paleta | Alta para o comportamento no emulador; não é hardware real |
 
 As 5 fontes principais: [SNESdev wiki] (várias páginas), [fullsnes], [undisbeliever], [Dizworld] e [bsnes].
 
@@ -50,7 +55,7 @@ As 5 fontes principais: [SNESdev wiki] (várias páginas), [fullsnes], [undisbel
 ## Não confirmado ou fora do escopo
 
 - **Atores e máquina de estados**: não foi achado documento de estúdio da época descrevendo o seu sistema de objetos; o padrão está como arquitetura comum, sem atribuir a jogo.
-- **Paleta de hora do dia e estação**: a técnica (cópia da CGRAM na WRAM, recalcular, DMA, ou tinta pela cor fixa) é consequência das fontes, mas qual jogo comercial usava cada caminho não foi confirmado. Pendente na issue #35.
+- **Hora do dia em outros jogos**: só o Harvest Moon tem o caminho descrito em texto técnico. Para Breath of Fire II há só a observação de um código de trapaça [VG Resource: Breath of Fire 2]; Seiken Densetsu 3, Terranigma e Lufia não têm descrição achada (busca de 03/11/2026 no GitHub, em fóruns e em japonês).
 - **Vídeos do Retro Game Mechanics Explained**: sem transcrição achada; ficam só como leitura, porque o conteúdo já está coberto por [fullsnes] e pela [SNESdev wiki].
 - **Página "Tricks" da SNESdev wiki**: deu 404 em 2026; em 02/11/2026 a busca no site e no índice do archive.org (prefixo `snes.nesdev.org/wiki/Trick`) só achou outra página ("Tricky-to-emulate games"). Não há cópia arquivada, então foi descartada.
 - Um texto no kakuyomu (https://kakuyomu.jp/users/meikjy/news/16818093084663682415) foi descartado como relato em japonês.
@@ -63,5 +68,9 @@ As 5 fontes principais: [SNESdev wiki] (várias páginas), [fullsnes], [undisbel
 - **Medir o quadro pela cor de fundo**: [NESdev BBS: CPU usage meter], [OpenSNES: profile.h] e [Teste local]. Não é fonte da época, mas o método está descrito e conferido.
 - **Streaming de quadros de animação**: caso de Super Mario World [sneslab: DMA channel usage in SMW][sneslab: Dynamic X] e o método de [Superfamicom wiki: Using DMA effectively].
 - **Relato técnico em japonês**: entrevistas de 2017 da Nintendo [Nintendo JP: F-ZERO][Nintendo JP: Super Mario Kart].
+
+## Resolvido na v0.3
+
+- **Paleta de hora do dia e estação num jogo da época** (issue #35): caso do Harvest Moon pelo guia da reimplementação em C e pelos mapas da desmontagem [HarvestMoonSnesDecomp: GUIDE][HM-Decomp], com exemplo próprio em asar testado no Mesen [Teste local].
 
 Related: [../SKILL.md](../SKILL.md)
