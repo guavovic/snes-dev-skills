@@ -29,6 +29,9 @@ Documentos usados nas skills, com o que cada um cobre e o quanto é confiável. 
 | [Capstone](https://github.com/capstone-engine/capstone) | equipe do Capstone | Desmontagem 65816 por script, modos de M e X, lida no código e rodada na 5.0.7 | Alta |
 | [sm_disassembly](https://github.com/InsaneFirebat/sm_disassembly) | InsaneFirebat | Organização da desmontagem do Super Metroid que monta no asar (só a estrutura) | Média |
 | [z3randomizer](https://github.com/KatDevsGames/z3randomizer) | KatDevsGames e colaboradores | Organização de um hack grande aberto em asar (só a estrutura) | Média |
+| [Lunar Compress](https://fusoya.eludevisibility.org/lc/index.html) | FuSoYa | Catálogo de formatos de compressão e os números da DLL, conferidos no pacote oficial v2.00 | Alta |
+| [sfc-comp](https://github.com/sfc-comp/sfc-comp) | sfc-comp (MIT) | Compressores de jogos de SNES reimplementados: LC_LZ11 e variantes de LZSS | Média/alta |
+| [YY-CHR @wiki](https://w.atwiki.jp/yychr/) | YY | Página oficial do YY-CHR, em japonês: versão e formatos | Alta |
 
 ## Por skill
 

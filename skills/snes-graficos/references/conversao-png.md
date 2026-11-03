@@ -52,11 +52,22 @@ python png_snes.py png2snes arte_nova.png arte.bin --bpp 4 --pal arte.pal --roun
 
 | Ferramenta | O que é | Fonte |
 |---|---|---|
-| YY-CHR (.NET) | Editor de tiles de YY, muito usado em ROM hack; formatos por plugin (há plugins de terceiros em DLL) | [YY-CHR plugins] |
+| YY-CHR (.NET) | Editor de tiles de YY, muito usado em ROM hack; última versão "YY-CHR.net build 2021/06/06", pede .NET Framework 4.0; formatos por plugin (há plugins de terceiros em DLL) | [YY-CHR @wiki] [YY-CHR plugins] |
 | Tile Molester | Editor de gráficos em Java, multiformato e extensível por `tmspec.xml`; original de SnowBro, com versões de Central MiB, Lab313, Mewster e toruzz (v0.21) | [Tile Molester] |
 | Mesen2 | Tile Viewer, Tilemap Viewer, Sprite Viewer, Palette Viewer e Tile Editor ao vivo, sobre a VRAM/CGRAM/OAM do jogo rodando | [Mesen2] |
 
-Lista de formatos do Tile Molester que interessa ao SNES: 1bpp, 2bpp, "3bpp planar composite (2bpp+1bpp)", "4bpp planar composite (2x2bpp)" e "8bpp planar composite (4x2bpp)"; o filtro de arquivo `.sfc/.smc/.fig` abre em 4bpp por padrão [Tile Molester]. Detalhes de menu e versão atual do YY-CHR **não confirmados** nesta pesquisa (página do romhacking.net bloqueada).
+Lista de formatos do Tile Molester que interessa ao SNES: 1bpp, 2bpp, "3bpp planar composite (2bpp+1bpp)", "4bpp planar composite (2x2bpp)" e "8bpp planar composite (4x2bpp)"; o filtro de arquivo `.sfc/.smc/.fig` abre em 4bpp por padrão [Tile Molester]. Formatos do YY-CHR.NET que interessam ao SNES, com o nome que aparece na lista do programa [YY-CHR @wiki]:
+
+| Nome no YY-CHR | Formato |
+|---|---|
+| `1BPP 8x8` | 1bpp |
+| `2BPP GB` | 2bpp do SNES: é o mesmo layout do Game Boy, que o documento do [Klarth] já chama de "SNES/Gameboy/GBC"; não existe item "2BPP SNES" |
+| `3BPP SNES` | 3bpp (2bpp + plano 2) |
+| `4BPP SNES/PCE(CG)` | 4bpp |
+| `8BPP SNES(128x128)` | 8bpp planar |
+| `8BPP SNES Mode7` | Mode 7; incluído em 15/05/2019 e marcado pelo próprio autor como "動作未確認" (funcionamento não conferido) |
+
+O YY-CHR também lê paleta de arquivo de estado de emulador e de `.pal` em 15 bits do SNES. A versão em C++ foi descontinuada; a página oficial mudou pro @wiki quando o GeoCities japonês fechou [YY-CHR @wiki].
 
 ## Fluxo de ROM hack: extrair, editar, reinserir
 
