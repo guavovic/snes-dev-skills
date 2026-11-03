@@ -68,6 +68,29 @@ Formato da tabela [fullsnes] [SNESdev wiki]:
 
 Custo [anomie timing, via superfamicom.org]: no começo do quadro, cerca de 18 clocks mais 8 por canal direto ou 24 por indireto; por linha, cerca de 18 clocks mais 8 por canal ativo e 8 por byte transferido, e mais 16 quando um canal indireto carrega novo ponteiro. São valores **aproximados**.
 
+## HDMA ligado no meio do quadro
+
+O HDMA tem dois momentos por quadro [SNESdev wiki: HDMA] [superfamicom.org: registers]:
+
+- **Inicialização**, no começo da linha 0: para cada canal ligado em `HDMAEN`, copia `A1T` para `A2A`, lê a primeira contagem para `NLTR` e (no indireto) o primeiro ponteiro. A primeira transferência acontece no hblank do fim da linha 0, então ela vale a partir da linha 1.
+- **Transferência**, no hblank de cada linha visível: canal com dado pendente escreve, `NLTR` desconta uma linha e, quando chega a zero, lê a próxima entrada.
+
+Ligar o canal depois da linha 0 pula a inicialização: o canal parte do que estiver em `A2A` e `NLTR` e começa no próximo hblank. Por isso esses registradores precisam ser escritos à mão antes de ligar [superfamicom.org: registers]. Canal que já chegou ao `$00` da tabela neste quadro não volta a rodar até a próxima inicialização; escrever 0 no bit do canal pausa e escrever 1 continua de onde parou [superfamicom.org: registers].
+
+O ponto difícil é uma flag interna por canal, "há dado para escrever nesta linha", que o software não lê nem escreve. No código do ares e do Mesen2 ela é zerada no começo de todo quadro e só fica 1 quando algum canal está ligado na inicialização da linha 0; ao ler uma entrada nova da tabela ela vira 1 de novo [ares: `sfc/cpu/dma.cpp`] [Mesen2: `SnesDmaController.cpp`]. O próprio ares marca esse trecho como "needs hardware verification". Consequência: a mesma escrita em `A2A` e `NLTR` dá resultados diferentes conforme outro canal estava ligado ou não no começo do quadro.
+
+Teste local no MesenCE 2.2.1, ROM própria, canal 7 com o gradiente de 4 entradas de 8 linhas em `CGADD`/`CGDATA`, ligado por IRQ na linha 100 [Teste local]:
+
+| Inicialização à mão | Outro canal ligado desde a linha 0? | Resultado |
+|---|---|---|
+| Nenhuma (`A2A` e `NLTR` com lixo) | Não | Cores de lixo |
+| `A2A` = início da tabela + 1, `NLTR` = primeira contagem | Não | Nada aparece: a flag ficou em 0 e o primeiro dado é pulado |
+| `A2A` = início da tabela + 1, `NLTR` = primeira contagem | Sim (canal 6 com tabela vazia) | Gradiente a partir da linha 101 |
+| `A2A` = início da tabela, `NLTR` = $01 | Não | Gradiente a partir da linha 102 (uma linha a mais para ler a entrada) |
+| `A2A` = início da tabela, `NLTR` = $01 | Sim | Cor errada: o byte de contagem é escrito como dado |
+
+Recomendação: evitar ligar HDMA no meio do quadro. Para um efeito que começa no meio da tela, ligue o canal no vblank e ponha no começo da tabela uma entrada de espera (por exemplo `$7F` linhas com um valor neutro, mais o que faltar) até a linha desejada. Se ligar no meio for inevitável, mantenha sempre um canal ligado desde o vblank (mesmo com tabela vazia, só `$00`) e use a receita "`A2A` = início da tabela + 1, `NLTR` = primeira contagem": assim a flag fica em estado conhecido. Nenhuma receita funcionou nos dois casos, e o comportamento no console real **não foi confirmado** (ver [fontes.md](fontes.md)).
+
 ## Prioridade e convivência
 
 - HDMA tem prioridade sobre o DMA geral: se o HDMA precisa rodar no meio de um DMA, o DMA pausa e continua depois [fullsnes] [SNESdev wiki].
@@ -82,7 +105,7 @@ Fontes: [fullsnes] [SNESdev wiki: DMA registers].
 - Em algumas revisões do 5A22, um DMA que termina exatamente quando o HDMA começa pode travar o console. Contorno: não deixar DMA geral rodando perto do hblank com HDMA ativo, ou fazer o DMA só no vblank.
 - BBAD = `$00` com padrões de mais de um registrador falha em algumas revisões; o contorno citado é usar `$FF` com padrão 1 para alcançar $21FF e $2100.
 - No 5A22 versão 2, HDMA escrevendo em `INIDISP` ($2100) pode fazer um DMA geral simultâneo falhar.
-- Ligar um canal de HDMA no meio do quadro exige inicializar `$43x8-$43xA` à mão, e o comportamento completo **não é totalmente conhecido**; esta skill não cobre esse caso.
+- Ligar um canal de HDMA no meio do quadro exige inicializar `$43x8-$43xA` à mão. Ver a seção abaixo.
 
 ## Armadilhas
 

@@ -39,7 +39,7 @@ Toda afirmação técnica dos references tem fonte entre colchetes (`[fullsnes]`
 | VRAM inteira apagada | DMA com contagem 0 (vale 64K) | [dma-hdma.md](references/dma-hdma.md) |
 | Leitura da VRAM devolve valor anterior | Prefetch de $2139: regrave VMADD antes de ler | [ppu-registradores.md](references/ppu-registradores.md) |
 | Sprites piscando ou faltando | Mais de 32 OBJs ou 34 tiles na linha (STAT77) | [ppu-formatos.md](references/ppu-formatos.md) |
-| OBJ aparece no topo da tela | OBJ alto com Y perto do fim dá a volta | [ppu-formatos.md](references/ppu-formatos.md) |
+| OBJ aparece no topo da tela | Y dá a volta: OBJ de 32 só some com Y = 224, e de 64 não some pelo Y | [ppu-formatos.md](references/ppu-formatos.md) |
 | Travamento em IRQ | Handler não lê $4211 | [interrupcoes-e-timing.md](references/interrupcoes-e-timing.md) |
 | Controle com leitura errada | Leu $4218 com o auto-joypad em andamento | [controles.md](references/controles.md) |
 | Multiplicação com resultado parcial | Leu $4216 antes de 8 ciclos (16 na divisão) | [cpu-5a22.md](references/cpu-5a22.md) |
@@ -55,8 +55,8 @@ Toda afirmação técnica dos references tem fonte entre colchetes (`[fullsnes]`
 | [mapa-de-memoria.md](references/mapa-de-memoria.md) | Bancos e velocidades, LoROM, HiROM, ExHiROM, SRAM, header do cartucho, vetores, chips especiais (visão geral) |
 | [cpu-5a22.md](references/cpu-5a22.md) | Núcleo 65C816 em resumo, estado no reset, tabela $4016-$421F, porta da WRAM, matemática |
 | [ppu-registradores.md](references/ppu-registradores.md) | Tabela completa $2100-$213F com bits e quando escrever, fórmula do Mode 7, armadilhas do PPU |
-| [ppu-formatos.md](references/ppu-formatos.md) | Modos de BG, formato de tile, tilemap, Mode 7 na VRAM, OAM, limites por linha, CGRAM, prioridade entre camadas |
-| [dma-hdma.md](references/dma-hdma.md) | Registradores $43x0-$43xF, padrões, DMA geral, orçamento do vblank, tabela de HDMA, custos e bugs |
+| [ppu-formatos.md](references/ppu-formatos.md) | Modos de BG, offset-per-tile, formato de tile, tilemap, Mode 7 na VRAM, OAM, Y e X para esconder OBJ, limites por linha, CGRAM, prioridade entre camadas |
+| [dma-hdma.md](references/dma-hdma.md) | Registradores $43x0-$43xF, padrões, DMA geral, orçamento do vblank, tabela de HDMA, HDMA ligado no meio do quadro, custos e bugs |
 | [interrupcoes-e-timing.md](references/interrupcoes-e-timing.md) | Relógios, linha do tempo do quadro, NMI, IRQ de H/V, FastROM e SlowROM |
 | [controles.md](references/controles.md) | Auto-joypad, formato de JOYn, leitura manual |
 | [apu.md](references/apu.md) | SPC700, DSP, mapa da ARAM, portas $2140-$2143, protocolo de upload da IPL |
@@ -65,4 +65,4 @@ Toda afirmação técnica dos references tem fonte entre colchetes (`[fullsnes]`
 
 ## Fora do escopo
 
-Detalhe dos chips de cartucho (SA-1, SuperFX, DSP-n), programação do driver de som no SPC700, formato BRR em detalhe, offset-per-tile em detalhe e HDMA ligado no meio do quadro. O que não tem fonte confirmada está listado em [fontes.md](references/fontes.md).
+Detalhe dos chips de cartucho (SA-1, SuperFX, DSP-n; o que cada um resolvia está em `snes-tecnicas/references/chips-especiais.md`), programação do driver de som no SPC700 e formato BRR em detalhe. HDMA ligado no meio do quadro, a janela da CGRAM e o force blank no meio da linha estão documentados como os emuladores de precisão fazem, sem medição em console real. O que não tem fonte confirmada está listado em [fontes.md](references/fontes.md).

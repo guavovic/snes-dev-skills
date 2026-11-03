@@ -12,7 +12,8 @@ Documentos usados nas skills, com o que cada um cobre e o quanto é confiável. 
 | [Datasheet do W65C816S](https://www.westerndesigncenter.com/wdc/documentation/w65c816s.pdf) | Western Design Center | Núcleo 65816: registradores, flags, opcodes, vetores | Alta |
 | [Manual do asar](https://github.com/RPGHacker/asar) | RPGHacker e colaboradores | Sintaxe, diretivas e mapeamento do montador | Alta |
 | [Mesen 2 / MesenCE](https://github.com/nesdev-org/MesenCE) | Sour e colaboradores | Debugger, CDL, API Lua e modo de teste, lidos no código | Alta |
-| [bsnes](https://github.com/bsnes-emu/bsnes) | byuu (Near) e colaboradores | Desempate de comportamento de hardware; temporização de refresh, NMI e IRQ lida no código | Apoio |
+| [bsnes](https://github.com/bsnes-emu/bsnes) | byuu (Near) e colaboradores | Desempate de comportamento de hardware; temporização de refresh, NMI e IRQ lida no código; janela de escrita na CGRAM | Apoio |
+| [ares](https://github.com/ares-emulator/ares) | Near e mantenedores do ares | Desempate de comportamento de hardware (HDMA) | Apoio |
 | [sd2snes / FXPAK](https://sd2snes.de/blog/compatibility) | ikari_01 (mrehkopf) | Lista oficial de incompatibilidades do flash cart (SPC7110, ST-011, ST-018) | Alta |
 | [QUsb2snes](https://github.com/Skarsnik/QUsb2snes) | Skarsnik | Protocolo usb2snes: leitura e escrita de memória pela USB | Alta |
 | [Super EverDrive X6](https://krikzz.com/our-products/cartridges/super-everdrive-x6.html) | krikzz | Chips suportados pelo flash cart | Alta |
