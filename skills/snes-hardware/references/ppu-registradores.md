@@ -82,7 +82,11 @@ Fórmula [fullsnes] [SNESdev wiki]:
 | $2122 | CGDATA | x2. Cor de 15 bits: `0BBBBBGG GGGRRRRR`, byte baixo primeiro | VB/FB (ver divergência) |
 | $213B | RDCGRAM | x2. Leitura da cor (bit7 do byte alto é open bus) | VB/FB |
 
-Divergência: o [SNESdev wiki] diz que a CGRAM pode ser escrita em vblank, hblank ou force blank. O [fullsnes] diz que no hblank só funciona numa janela curta de poucos ciclos. **Recomendação desta skill:** trocar cor por HDMA no hblank é técnica conhecida, mas trate como avançada e teste em hardware ou em emulador de precisão; para escrita feita pela CPU, use vblank ou force blank.
+Divergência: o [SNESdev wiki: PPU registers] diz que a CGRAM pode ser escrita em vblank, hblank ou force blank, e que a escrita com a tela desenhando vai para o endereço errado. O [fullsnes] diz que no hblank ela só funciona em parte do tempo.
+
+Os emuladores de precisão concordam entre si numa janela exata [bsnes: `sfc/ppu/io.cpp`] [Mesen2: `SnesPpu.cpp`]: fora do force blank, nas linhas visíveis, uma escrita com o contador horizontal entre 88 e 1095 master clocks (pontos 22 a 273 da linha) cai no endereço que o PPU está lendo naquele momento, e não no de `CGADD`. Fora dessa faixa a escrita vale normalmente. Na prática, a janela no hblank vai do ponto 274 de uma linha até o ponto 21 da seguinte, cerca de 356 master clocks numa linha de 1364. O HDMA escreve no começo do hblank (ponto 278), dentro da janela; o gradiente de [exemplos.md](exemplos.md) troca a cor a cada 8 linhas sem erro no MesenCE 2.2.1 [Teste local].
+
+**Recomendação desta skill:** para escrita feita pela CPU, use vblank ou force blank. Trocar cor no hblank pelo HDMA funciona nos emuladores de precisão; a janela no console real **não foi confirmada** por medição própria.
 
 ## Janelas
 
@@ -132,10 +136,11 @@ Só OBJs com paleta 4-7 entram no color math; paletas 0-3 ficam imunes [fullsnes
 
 ## Armadilhas
 
-- **Force blank:** escreva `$8F` (force blank + brilho máximo guardado) e não `$80`. Ao sair, `$0F`. Desligar o force blank no meio da tela, fora do vblank, pode corromper a avaliação de sprites daquela linha e da seguinte [fullsnes].
-- **Bug do INIDISP:** em alguns modelos, uma escrita em $2100 pode ter efeito antecipado e gerar glitch. Contorno citado pelo [fullsnes]: escrever com endereço longo (`sta.l $002100` ou espelho em banco alto, como `$8F2100`). O momento exato em que o force blank passa a valer dentro da linha **não foi confirmado** nas fontes consultadas.
+- **Force blank:** escreva `$8F` (force blank + brilho máximo guardado) e não `$80`. Ao sair, `$0F`. Desligar o force blank no meio da tela, fora do vblank, pode corromper a avaliação de sprites daquela linha e da seguinte [fullsnes] [SNESdev wiki: PPU registers]; fora do hblank também corrompe tiles de BG [SNESdev wiki: PPU registers]. O [anomie timing] fala em cerca de 16 a 24 pixels de lixo depois de desligar no meio da linha.
+- **Force blank no meio da linha:** a escrita vale quase na hora, não na linha seguinte. O Mesen2 desenha a linha até o ponto atual e aplica o novo valor cerca de 22 pontos antes do contador H [Mesen2: `SnesPpu.cpp`]. Teste local no MesenCE 2.2.1: `$8F` escrito por IRQ na linha 100, no ponto 165 da linha, deixou preto a partir do pixel 144 dessa linha e a tela inteira daí para baixo [Teste local]. No console real o ponto exato **não foi confirmado**, e mudanças de brilho também não são instantâneas [SNESdev wiki: PPU registers].
+- **Bug do INIDISP:** em alguns modelos, uma escrita em $2100 pode ter efeito antecipado e gerar glitch. Contorno citado pelo [fullsnes] e pelo [SNESdev wiki: PPU registers]: escrever com endereço longo (`sta.l $002100` ou espelho em banco alto, como `$8F2100`).
 - **OAMADD é recarregado** no início de todo vblank. Se o código escreve a OAM aos poucos, regrave o endereço antes de cada lote.
 - **Escrita na VRAM fora de VB/FB some** sem erro, mas o endereço avança: o resto do upload sai deslocado.
 - **Leitura de VRAM com prefetch:** sempre regrave VMADD antes de ler.
 - **Mode 7 e multiplicador** usam os mesmos registradores. No Mode 7 ativo, o multiplicador só dá resultado confiável em vblank ou force blank [fullsnes] [SNESdev wiki].
-- **Offset-per-tile** (modos 2, 4 e 6): o [fullsnes] marca a seção como incompleta. O formato básico é: o BG3 vira tabela de deslocamento por coluna para BG1/BG2. Os detalhes finos **ficam de fora** desta skill.
+- **Offset-per-tile** (modos 2, 4 e 6): o BG3 vira tabela de scroll por coluna para BG1 e BG2. Formato e regras em [ppu-formatos.md](ppu-formatos.md#offset-per-tile-modos-2-4-e-6).

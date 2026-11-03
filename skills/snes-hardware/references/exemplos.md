@@ -2,6 +2,10 @@
 
 Código original, escrito para esta skill, na sintaxe do asar (`asar exemplo.asm rom.sfc`). Os imediatos com rótulo levam `.w`/`.b` explícito para o asar não ter de adivinhar o tamanho. Cada trecho aplica regras documentadas nos outros arquivos; a fonte de cada regra está indicada lá.
 
+Os dois trechos foram montados com o asar 1.91 (`--no-title-check`, sobre um arquivo de 32 KB zerado) e conferidos no MesenCE 2.2.1 com ROM própria em 02/11/2026 [Teste local]. A montagem achou um erro na tabela de vetores (4 words reservadas no começo em vez de 2, o que empurrava o vetor de RESET para fora do banco), já corrigido abaixo.
+
+Cuidado com imediato numérico no asar: ele escolhe o tamanho pelo número de dígitos, não pelo modo da CPU. `cpx #128` ou `ldx #100` saem com 8 bits mesmo com X em 16, e a CPU sai do trilho. Com X ou A em 16 bits, escreva `cpx.w #128` ou use 4 dígitos em hexa (`#$0080`) [Teste local].
+
 ## Esqueleto LoROM: init, DMA para a VRAM, NMI e controle
 
 ```asm
@@ -91,16 +95,16 @@ grafico:
 grafico_fim:
 
 org $00FFE0                 ; vetores (banco 00)
-    dw 0, 0, 0, 0           ; reservado
+    dw 0, 0                 ; reservado    FFE0-FFE3
     dw 0                    ; COP nativo   FFE4
     dw 0                    ; BRK nativo   FFE6
     dw 0                    ; ABORT nativo FFE8
     dw nmi                  ; NMI nativo   FFEA
     dw 0                    ; reservado    FFEC
     dw irq                  ; IRQ nativo   FFEE
-    dw 0, 0                 ; reservado
+    dw 0, 0                 ; reservado    FFF0-FFF3
     dw 0                    ; COP emulação FFF4
-    dw 0                    ; reservado
+    dw 0                    ; reservado    FFF6
     dw 0                    ; ABORT        FFF8
     dw 0                    ; NMI emulação FFFA
     dw reset                ; RESET        FFFC
@@ -118,7 +122,7 @@ Pontos que o exemplo demonstra:
 
 ## Tabela de HDMA: gradiente na cor de fundo
 
-Escreve na CGRAM a cor 0 a cada 8 linhas. Usa o padrão 3 em `$2121` (`+0 +0 +1 +1`: CGADD duas vezes, depois CGDATA duas vezes). Por envolver escrita na CGRAM no hblank, veja a divergência registrada em [ppu-registradores.md](ppu-registradores.md) e teste em emulador de precisão.
+Escreve na CGRAM a cor 0 a cada 8 linhas. Usa o padrão 3 em `$2121` (`+0 +0 +1 +1`: CGADD duas vezes, depois CGDATA duas vezes). Por envolver escrita na CGRAM no hblank, veja a janela registrada em [ppu-registradores.md](ppu-registradores.md). O trecho supõe A em 8 bits e X em 16 bits, como no esqueleto acima. No MesenCE 2.2.1 a cor troca a cada 8 linhas a partir da linha 1 [Teste local]; as cores abaixo são tons de azul bem escuros, troque por cores mais fortes (por exemplo `$001F`, `$03E0`, `$7C00`) para ver o efeito com clareza.
 
 ```asm
 ; canal 7, modo direto, padrão 3, destino $2121
