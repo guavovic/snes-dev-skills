@@ -21,6 +21,11 @@ Documentos usados nas skills, com o que cada um cobre e o quanto é confiável. 
 | [Programming the 65816](https://archive.org/details/0893037893ProgrammingThe65816) | David Eyes e Ron Lichty, 1986 | Livro de referência do 65816: MVN/MVP, apelidos de mnemônico | Alta |
 | [Investigating 65C816 Interrupts](http://6502.org/tutorials/65c816interrupts.html) | BCS Technology, 6502.org | Ciclos e latência de interrupção, `WAI` | Alta |
 | [WLA-DX](https://github.com/vhelin/wla-dx) | Ville Helin e colaboradores | Sintaxe 65816 do WLA-DX, lida na documentação, no código e nos testes | Alta |
+| [Snes9x](https://github.com/snes9xgit/snes9x) | equipe do Snes9x | Checksum espelhado, mapa ExLoROM e SRAM, lidos no `memmap.cpp` | Alta |
+| [Código do sd2snes / FXPAK](https://github.com/mrehkopf/sd2snes) | ikari_01 (mrehkopf) | Detecção de mapeamento no firmware, mapa de ROM e SRAM na FPGA | Alta pro que o código faz; sem teste em hardware |
+| [Lunar Expand](https://fusoya.eludevisibility.org/le/) | FuSoYa | Suporte a ExLoROM por versão do Snes9x e do ZSNES | Média-alta |
+| [Regras de envio do SMW Central](https://web.archive.org/web/20250725214811/https://www.smwcentral.net/?p=guidelines&page=1633980-all-hacks) | SMW Central | Formato e regras de envio de hack, lidos em cópia do Internet Archive | Alta |
+| [z3randomizer](https://github.com/KatDevsGames/z3randomizer) | KatDevsGames e colaboradores | Organização de um hack grande aberto em asar (só a estrutura) | Média |
 
 ## Por skill
 

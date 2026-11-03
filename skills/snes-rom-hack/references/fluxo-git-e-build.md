@@ -10,7 +10,7 @@ O repositório guarda só o que é seu: fonte asm, gráficos novos, tabelas, scr
 4. Copia pra `build/hack.sfc` e roda o asar nela.
 5. Gera `build/hack.bps` com o flips.
 
-Distribuir patch em vez de ROM é a regra da comunidade [SMWC-2ª] e o BPS é o formato que o flips recomenda [flips]; ele também confere o CRC32 da ROM de quem aplica [BPS].
+Distribuir patch em vez de ROM é a regra da comunidade [SMWC] e o BPS é o formato que o flips recomenda [flips]; ele também confere o CRC32 da ROM de quem aplica [BPS].
 
 ## Estrutura mínima
 
@@ -114,7 +114,7 @@ subprocess.run(["flips", "--create", "--bps", str(limpa), str(hack), str(saida /
 print("ok:", saida / "hack.bps")
 ```
 
-Uso: `python build.py C:\caminho\da\rom.sfc`. Precisa de `asar` e `flips` no PATH.
+Uso: `python build.py C:\caminho\da\rom.sfc`. Precisa de `asar` e `flips` no PATH. A ROM base precisa ter pelo menos 512 KB: o `freecode` do exemplo depende da autoexpansão do asar, que só acontece a partir de 512 KB (ver `mapeamento-e-expansao.md`).
 
 ## Boas práticas
 
@@ -125,4 +125,13 @@ Uso: `python build.py C:\caminho\da\rom.sfc`. Precisa de `asar` e `flips` no PAT
 - **Teste em emulador de alta precisão** (bsnes, Mesen) e, se der, em flash cart; emulador permissivo esconde erro de mapeamento e de timing.
 - **Não versione `.srm`** (save) nem estado salvo.
 
-O exemplo não foi montado num asar nesta pesquisa; a sintaxe segue o manual [asar].
+## O exemplo rodado de verdade
+
+Em 02/11/2026 o `main.asm` e o `hooks.asm` acima foram montados sem nenhuma mudança no asar 1.91, sobre uma ROM base própria (512 KB de zeros, com um RESET que grava `$42` em `$10` e pula pra `$8123`, onde estão os bytes `A5 10 8D 00 02` do comentário) [Teste local]:
+
+- O asar expandiu a ROM de 512 KB pra 1 MB e mudou `$FFD7` pra `$0A`.
+- Em `$8123` ficou `22 08 80 90 EA`: `JSL $90:8008` mais o `NOP`. O `freecode` foi pro offset `$80000` (banco `$90`), com a marca RATS "STAR" nos 8 bytes antes da rotina.
+- `--symbols=wla` gerou o `hack.sym`.
+- No Mesen 2.2.1 com `--testRunner`, um script Lua leu a WRAM no décimo quadro: na ROM base, `$7E:1F00` tinha lixo de power-on e `$0200` = `$42`; no hack, `$7E:1F00` = `$01` e `$0200` = `$42`. O hook rodou e as instruções refeitas também.
+
+O passo do flips não foi rodado: o download do binário foi barrado nesta rodada, então o `build.py` ainda para nesse passo se o `flips` não estiver no PATH. A linha de comando segue o README do [flips].

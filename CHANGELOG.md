@@ -5,6 +5,7 @@
 - **snes-testes**: Mesen rodado de verdade (print no terminal, `allowIoOsAccess`, chaves do `emu.getState()`, executável por sistema, receita conferida e exemplo de PowerShell corrigido para esperar o processo); FXPAK, usb2snes, Super EverDrive e snes9x com fonte oficial ou comparação registrada.
 - **snes-assembly**: sintaxe do WLA-DX conferida no código, temporização de refresh, NMI e IRQ pelo bsnes, Eyes e Lichty e 6502.org como fontes, e todos os exemplos montados no asar 1.91 (hook agora com `autoclean`).
 - **snes-hardware**: exemplos montados no asar e rodados no Mesen (tabela de vetores corrigida); HDMA ligado no meio do quadro, janela da CGRAM, force blank no meio da linha, offset-per-tile e Y e X para esconder OBJ documentados com código de emulador e teste próprio; datas das fontes conferidas.
+- **snes-rom-hack**: projeto mínimo montado no asar 1.91 e rodado no Mesen, checksum de tamanho irregular comparado entre asar, Snes9x e SNESdev, ExLoROM e SRAM conferidos no código do Mesen, Snes9x e FXPAK, regras de envio oficiais do SMW Central e organização do z3randomizer como referência.
 
 ## v0.1
 

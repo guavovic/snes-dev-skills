@@ -9,7 +9,7 @@ ROM hack é patch em cima de uma ROM que você não pode distribuir. O trabalho 
 
 ## Regras de ouro
 
-1. **A ROM nunca entra no repositório nem no release.** Distribua BPS (ou IPS). O build lê a ROM local, confere o hash e só então monta [flips][SMWC-2ª]. Ver `references/fluxo-git-e-build.md`.
+1. **A ROM nunca entra no repositório nem no release.** Distribua BPS (ou IPS). O build lê a ROM local, confere o hash e só então monta [flips][SMWC]. Ver `references/fluxo-git-e-build.md`.
 2. **Trabalhe sem cabeçalho de copiador.** Arquivo com tamanho `mod 1024 = 512` tem 512 bytes de lixo no começo; tire antes de tudo [fullsnes][SNESdev]. No asar, `.smc` é tratado como com cabeçalho e `.sfc` sem [asar].
 3. **Descubra o mapeamento antes do primeiro `org`.** LoROM: cabeçalho no offset `$7FC0`; HiROM: `$FFC0`; ExHiROM: `$40FFC0` [fullsnes][SNESdev]. Errou o mapper, todo endereço sai errado. Ver `references/cabecalho-e-checksum.md`.
 4. **Espaço livre não é "bytes zerados".** Zero pode ser dado do jogo. Só use área que você provou estar livre (fim da ROM depois de expandir, ou região rastreada no debugger) e deixe o asar marcar com RATS [asar]. Ver `references/espaco-livre-e-hooks.md`.
@@ -17,7 +17,7 @@ ROM hack é patch em cima de uma ROM que você não pode distribuir. O trabalho 
 6. **Devolva o estado como recebeu.** `PHP` / `PHB` / `PHD` na entrada, `PLD` / `PLB` / `PLP` na saída. Ir pra 8 bits em X/Y zera o byte alto de X e Y, e o `PLP` não traz esse byte de volta [fullsnes].
 7. **Checksum é conferido, não é decoração.** O asar recalcula por padrão; ferramenta externa que mexer na ROM depois precisa recalcular também [asar][fullsnes].
 8. **Use `check title`** no patch pra recusar ROM errada (outra região, outra revisão) [asar].
-9. **Expandir é mudar `$FFD7` e preencher o fim da ROM.** Passou de 4 MB, é ExLoROM ou ExHiROM, que não têm o mesmo suporte em todo emulador e flash cart [bsnes][Epilogue].
+9. **Expandir é mudar `$FFD7` e preencher o fim da ROM, pra um tamanho regular.** Tamanho que não é potência de 2 nem soma de duas faz asar, Snes9x e SNESdev calcularem checksums diferentes [Teste local]. Passou de 4 MB, é ExLoROM ou ExHiROM; ExLoROM roda em bsnes, Mesen e Snes9x atual, mas não no ZSNES nem em Snes9x 1.50 a 1.53 [MesenCE][LunarExpand].
 10. **Documente cada hook:** endereço original, bytes originais e instruções refeitas num comentário curto. Facilita portar pra outra revisão da ROM.
 
 ## Armadilhas
@@ -28,6 +28,7 @@ ROM hack é patch em cima de uma ROM que você não pode distribuir. O trabalho 
 - **Flag usada depois do hook.** Se o código original faz `BEQ` logo depois dos bytes sobrescritos, a última instrução refeita tem que deixar Z como antes. Por isso as instruções originais vão no fim da rotina, depois do `PLP`.
 - **freecode em jogo que não é Super Mario World.** O asar procura espaço livre a partir do banco `$10` (offset `$80000`) e confia em RATS [asar]. Em ROM de outro jogo com 1 MB ou mais, esse trecho é do jogo. Expanda primeiro, ou use `freespace` com `start=` (asar 2.0), ou `org` em área provada.
 - **Detecção de cabeçalho de copiador diferente entre ferramentas.** bsnes usa `tamanho & $7FFF = 512`, fullsnes e SNESdev usam `tamanho mod 1024 = 512` [bsnes][fullsnes]. Arquivo de tamanho estranho pode enganar uma e não a outra.
+- **ROM base menor que 512 KB.** O asar não autoexpande e o `freecode` falha por falta de espaço [Teste local].
 - **SRAM aumentada sem ajustar o jogo.** O emulador dimensiona a SRAM por `$FFD8` [bsnes], mas o jogo pode zerar ou somar (checksum) só o tamanho antigo [fullsnes]. Ver `references/mapeamento-e-expansao.md`.
 - **IPS acima de 16 MB ou com offset `$454F46`.** IPS tem offset de 3 bytes e esse valor colide com a marca "EOF" [flips][sneslab]. BPS não tem o problema e ainda confere CRC32.
 - **Patch aplicado na ROM errada ou duas vezes.** IPS não sabe em que ROM foi aplicado. BPS recusa ROM com CRC32 diferente [BPS].
@@ -41,8 +42,8 @@ ROM hack é patch em cima de uma ROM que você não pode distribuir. O trabalho 
 | `references/espaco-livre-e-hooks.md` | Achar espaço livre, RATS, anatomia de um hook com JSL, o que preservar, JML, trampolim, hook em vetor |
 | `references/asar.md` | Diretivas do asar pra hack: mapper, org, freespace/freecode/freedata, autoclean, prot, pushpc/pullpc, defines, macros, incsrc/incbin, check, avisos, linha de comando |
 | `references/patches-ips-bps.md` | Formato IPS e BPS byte a byte, flips na linha de comando, outras ferramentas |
-| `references/fluxo-git-e-build.md` | Projeto mínimo com asar: estrutura, `.gitignore`, script de build que confere o hash da ROM base, monta e gera o `.bps` |
-| `references/comunidade.md` | SMW Central, romhacking.net depois de 2024, etiqueta de distribuição |
+| `references/fluxo-git-e-build.md` | Projeto mínimo com asar (montado e rodado no Mesen): estrutura, `.gitignore`, script de build que confere o hash da ROM base, monta e gera o `.bps` |
+| `references/comunidade.md` | Regras de envio do SMW Central, romhacking.net depois de 2024, etiqueta de distribuição, organização de um hack grande aberto |
 | `references/fontes.md` | Fontes, confiança, divergências e o que não foi consultado |
 
 ## Relação com outras skills
