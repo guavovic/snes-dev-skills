@@ -42,16 +42,18 @@ Toda afirmação técnica dos references tem fonte entre colchetes (`[fullsnes]`
 - **Num BG 8bpp os sprites dividem as cores** $80-$FF com o BG.
 - **Paleta de sprite 0-3 não entra no color math**, só as 4-7.
 - **Exemplo antigo de superfamiconv** pode usar opção que mudou na v0.12 (reescrita em Rust): confira `--help`.
-- **Nome de formato do Lunar Compress é rótulo de catálogo**, não especificação: confirme na rotina do jogo antes de recomprimir.
+- **Nome de formato do Lunar Compress é rótulo de catálogo**, não especificação: confirme na rotina do jogo (ou no código do sfc-comp) antes de recomprimir. O número dos LZ na DLL é o do formato menos 1 (`LC_LZ2 = 1`); os RLE começam em 100.
+- **LZSS não tem padrão de SNES**: janela, valor inicial do anel, sentido das flags e divisão dos bits mudam de jogo pra jogo. O LZSS.C de Okumura (4096, 3 a 18, anel com espaço) é só o ponto de partida.
+- **1bpp na VRAM sem gastar CPU**: DMA só no byte baixo (VMAIN = `$00`, $2118) ou só no alto (VMAIN = `$80`, $2119). A outra metade da word não é escrita, então limpe a VRAM antes.
 
 ## Índice dos references
 
 | Arquivo | Conteúdo |
 |---|---|
-| [formatos-de-tile.md](references/formatos-de-tile.md) | 1bpp, 2bpp, 3bpp, 4bpp, 8bpp e Mode 7 byte a byte; tiles maiores que 8x8; achar tile na ROM |
+| [formatos-de-tile.md](references/formatos-de-tile.md) | 1bpp (e como expandir na carga), 2bpp, 3bpp, 4bpp, 8bpp e Mode 7 byte a byte; tiles maiores que 8x8; achar tile na ROM |
 | [paletas-e-cor.md](references/paletas-e-cor.md) | BGR555, truncar x arredondar, 5 → 8 bits, divisão da CGRAM por modo, direct color, escrita na CGRAM |
 | [tilemap-e-oam.md](references/tilemap-e-oam.md) | Entrada do tilemap, OAM (tabela baixa e alta), tamanhos do OBSEL, limites por linha |
 | [conversao-png.md](references/conversao-png.md) | superfamiconv, `png_snes.py`, editores de tile, fluxo de extrair, editar e reinserir |
-| [compressao.md](references/compressao.md) | Catálogo do Lunar Compress, LC_LZ2, LC_RLE1, LZSS, reconhecer pelos bytes e pelo trace do Mesen2 |
+| [compressao.md](references/compressao.md) | Catálogo e números do Lunar Compress, LC_LZ2, LC_RLE1, LZSS de Okumura e variantes de SNES, LC_LZ11, reconhecer pelos bytes e pelo trace do Mesen2 |
 | [png_snes.py](references/png_snes.py) | Script próprio (Python 3 + Pillow): PNG indexado ↔ tiles 1/2/3/4/8bpp e paleta BGR555 |
 | [fontes.md](references/fontes.md) | Fontes, confiança, o que não foi consultado e divergências |

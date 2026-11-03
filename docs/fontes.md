@@ -26,6 +26,9 @@ Documentos usados nas skills, com o que cada um cobre e o quanto é confiável. 
 | [Lunar Expand](https://fusoya.eludevisibility.org/le/) | FuSoYa | Suporte a ExLoROM por versão do Snes9x e do ZSNES | Média-alta |
 | [Regras de envio do SMW Central](https://web.archive.org/web/20250725214811/https://www.smwcentral.net/?p=guidelines&page=1633980-all-hacks) | SMW Central | Formato e regras de envio de hack, lidos em cópia do Internet Archive | Alta |
 | [z3randomizer](https://github.com/KatDevsGames/z3randomizer) | KatDevsGames e colaboradores | Organização de um hack grande aberto em asar (só a estrutura) | Média |
+| [Lunar Compress](https://fusoya.eludevisibility.org/lc/index.html) | FuSoYa | Catálogo de formatos de compressão e os números da DLL, conferidos no pacote oficial v2.00 | Alta |
+| [sfc-comp](https://github.com/sfc-comp/sfc-comp) | sfc-comp (MIT) | Compressores de jogos de SNES reimplementados: LC_LZ11 e variantes de LZSS | Média/alta |
+| [YY-CHR @wiki](https://w.atwiki.jp/yychr/) | YY | Página oficial do YY-CHR, em japonês: versão e formatos | Alta |
 
 ## Por skill
 

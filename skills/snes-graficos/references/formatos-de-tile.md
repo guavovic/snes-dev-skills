@@ -10,7 +10,7 @@ Conferência: os formatos de hardware (2bpp, 4bpp, 8bpp e Mode 7) batem em [full
 |---|---|---|---|---|
 | 1bpp | 2 | 8 | Só em ROM (fonte de texto, máscara); o jogo expande antes de mandar pra VRAM | [Tile Molester] [Klarth] |
 | 2bpp | 4 | 16 | BG no modo 0 (todos), BG3 no modo 1, BG2 nos modos 4 e 5 | [fullsnes] [SNESdev wiki: Tiles] |
-| 3bpp | 8 | 24 | Só em ROM; o jogo insere o 4º plano (zerado) e grava como 4bpp | [SNESLab: BGR555] [Tile Molester] |
+| 3bpp | 8 | 24 | Só em ROM; o jogo insere o 4º plano (zerado) e grava como 4bpp | [SNESLab: BGR555] [Tile Molester] [Klarth] |
 | 4bpp | 16 | 32 | Todos os OBJs; BG nos modos 1, 2, 3 (BG2), 5 e 6 | [fullsnes] [SNESdev wiki: Tiles] |
 | 8bpp | 256 | 64 | BG1 nos modos 3 e 4 | [fullsnes] [SNESdev wiki: Tiles] |
 | Mode 7 | 256 | 64 (em 128 bytes de VRAM) | BG do modo 7, 1 byte por pixel | [fullsnes] [SNESdev wiki: Tiles] [Mesen2] |
@@ -45,13 +45,26 @@ Quatro blocos de 2bpp: $00-$0F planos 0-1, $10-$1F planos 2-3, $20-$2F planos 4-
 
 ## 3bpp (24 bytes, só em ROM)
 
-Os 16 primeiros bytes são um tile 2bpp (planos 0 e 1 intercalados); os 8 seguintes são o plano 2, 1 byte por linha [SNESLab: BGR555]. O [Tile Molester] descreve o mesmo formato como "3bpp planar, composite (2bpp+1bpp)". O PPU não lê 3bpp: a rotina de carga do jogo intercala um plano 3 (normalmente zero) e grava 4bpp na VRAM [SNESLab: BGR555]. O [Lunar Compress] tem uma opção (`Format2=1` nos formatos LC_LZ1 e LC_LZ2) que converte 3bpp em 4bpp ao descomprimir, sinal de que o par "LZ + 3bpp" era comum.
+Os 16 primeiros bytes são um tile 2bpp (planos 0 e 1 intercalados); os 8 seguintes são o plano 2, 1 byte por linha [SNESLab: BGR555] [Klarth]. O [Tile Molester] descreve o mesmo formato como "3bpp planar, composite (2bpp+1bpp)". O PPU não lê 3bpp: a rotina de carga do jogo intercala um plano 3 (normalmente zero) e grava 4bpp na VRAM, antes ou durante a transferência [SNESLab: BGR555] [Klarth]. O [Lunar Compress] tem uma opção (`Format2=1` nos formatos LC_LZ1 e LC_LZ2) que converte 3bpp em 4bpp ao descomprimir, sinal de que o par "LZ + 3bpp" era comum.
 
 Consequência pra ROM hack: um gráfico 3bpp só usa as cores 0-7 de uma paleta de 16. Se você editar em 4bpp e usar cor 8-15, o plano 3 é perdido na reinserção.
 
 ## 1bpp (8 bytes, só em ROM)
 
-1 byte por linha, bit 7 à esquerda [Klarth] [Tile Molester]. Comum pra fonte de texto. O jogo expande pra 2bpp ou 4bpp na carga (às vezes copiando o mesmo byte nos dois planos, às vezes zerando um): confira na rotina de carga antes de supor. **Não confirmado** em fonte técnica qual é o jeito "padrão"; varia por jogo.
+1 byte por linha, bit 7 à esquerda, 8 bytes por tile [Klarth] [Tile Molester]. Comum pra fonte de texto. O PPU não tem modo 1bpp: o jogo (ou o homebrew) expande na carga [nesdev: 1bpp].
+
+Jeitos de expandir:
+
+| Jeito | Como | Resultado no tile 2bpp | Fonte |
+|---|---|---|---|
+| Só byte baixo | VMAIN = `$00` (incremento depois de $2118) e DMA modo 0 em $2118 | plano 0 = dado, plano 1 sem tocar: cor 1 | [PeterLemon SNES] [nesdev: 1bpp] [Teste local] |
+| Só byte alto | VMAIN = `$80` (incremento depois de $2119) e DMA modo 0 em $2119 | plano 1 = dado, plano 0 sem tocar: cor 2 | [nesdev: 1bpp] [Teste local] |
+| Byte copiado nos dois planos | rotina de software grava o mesmo byte em $2118 e $2119 | cor 3 | [nesdev: 1bpp] |
+| Expansão pra 4bpp | qualquer dos acima nos planos 0-1, e os 16 bytes dos planos 2-3 zerados | cor 1, 2 ou 3 da paleta | [nesdev: 1bpp] |
+
+Os dois primeiros não gastam CPU: o DMA escreve só uma metade de cada word e o endereço da VRAM anda 1 word por byte. A metade que não é escrita fica como estava, por isso a VRAM tem de estar zerada (ou com valor conhecido) antes [nesdev: 1bpp]. O [Teste local] confirmou no MesenCE 2.2.1 com uma ROM própria: depois de limpar a VRAM, 8 bytes por DMA com VMAIN = `$00` em $2118 caíram nos bytes pares (o ímpar ficou `$00`); com VMAIN = `$80` em $2119, nos ímpares.
+
+Qual desses um jogo comercial usa não tem fonte geral: confira na rotina de carga antes de supor. Fonte em ROM às vezes vem em 1bpp com largura variável ou comprimida, e aí a rotina é de software.
 
 ## Mode 7 (8bpp chunky, intercalado com o mapa)
 
