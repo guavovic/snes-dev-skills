@@ -89,7 +89,7 @@ Teste local no MesenCE 2.2.1, ROM própria, canal 7 com o gradiente de 4 entrada
 | `A2A` = início da tabela, `NLTR` = $01 | Não | Gradiente a partir da linha 102 (uma linha a mais para ler a entrada) |
 | `A2A` = início da tabela, `NLTR` = $01 | Sim | Cor errada: o byte de contagem é escrito como dado |
 
-Recomendação: evitar ligar HDMA no meio do quadro. Para um efeito que começa no meio da tela, ligue o canal no vblank e ponha no começo da tabela uma entrada de espera (por exemplo `$7F` linhas com um valor neutro, mais o que faltar) até a linha desejada. Se ligar no meio for inevitável, mantenha sempre um canal ligado desde o vblank (mesmo com tabela vazia, só `$00`) e use a receita "`A2A` = início da tabela + 1, `NLTR` = primeira contagem": assim a flag fica em estado conhecido. Nenhuma receita funcionou nos dois casos, e o comportamento no console real **não foi confirmado** (ver [fontes.md](fontes.md)).
+Recomendação: evitar ligar HDMA no meio do quadro. Para um efeito que começa no meio da tela, ligue o canal no vblank e ponha no começo da tabela uma entrada de espera (por exemplo `$7F` linhas com um valor neutro, mais o que faltar) até a linha desejada. Se ligar no meio for inevitável, mantenha sempre um canal ligado desde o vblank (mesmo com tabela vazia, só `$00`) e use a receita "`A2A` = início da tabela + 1, `NLTR` = primeira contagem": assim a flag fica em estado conhecido. Nenhuma receita funcionou nos dois casos, e o comportamento no console real **não foi confirmado** (ver [fontes.md](fontes.md)). A ROM [teste-console.asm](teste-console.asm) mede esse caso no console, com e sem o canal ligado desde o vblank.
 
 ## Prioridade e convivência
 

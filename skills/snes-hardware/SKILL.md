@@ -1,6 +1,6 @@
 ---
 name: snes-hardware
-description: Referência do hardware do Super Nintendo (SNES / Super Famicom) para programar em assembly 65816 ou depurar ROM. Use quando a tarefa envolver mapa de memória (LoROM, HiROM, ExHiROM, SRAM, header do cartucho, vetores), a CPU 5A22 e os registradores $42xx (NMITIMEN, MEMSEL, multiplicação e divisão), o PPU e os registradores $21xx (modos 0 a 7, BGs, tiles, tilemap, OAM e sprites, VRAM, CGRAM e paleta, scroll, janelas, color math, mosaico, Mode 7), DMA e HDMA ($43xx, tabelas de HDMA, quanto cabe no vblank), NMI, IRQ de H/V e timing de quadro (NTSC e PAL, vblank, hblank, ciclos por linha, FastROM e SlowROM), leitura de controle com auto-joypad ($4218) ou a comunicação com o APU (SPC700, DSP, portas $2140-$2143, upload pela IPL). Também serve para perguntas como "qual bit liga o force blank", "por que minha escrita na VRAM sumiu", "quanto DMA cabe no vblank" ou "como faço um gradiente com HDMA".
+description: Referência do hardware do Super Nintendo (SNES / Super Famicom) para programar em assembly 65816 ou depurar ROM. Use quando a tarefa envolver mapa de memória (LoROM, HiROM, ExHiROM, SRAM, header do cartucho, vetores), a CPU 5A22 e os registradores $42xx (NMITIMEN, MEMSEL, multiplicação e divisão), o PPU e os registradores $21xx (modos 0 a 7, BGs, tiles, tilemap, OAM e sprites, VRAM, CGRAM e paleta, scroll, janelas, color math, mosaico, Mode 7), DMA e HDMA ($43xx, tabelas de HDMA, quanto cabe no vblank), NMI, IRQ de H/V e timing de quadro (NTSC e PAL, vblank, hblank, ciclos por linha, FastROM e SlowROM), leitura de controle com auto-joypad ($4218) ou a comunicação com o APU (SPC700, DSP, portas $2140-$2143, upload pela IPL, registradores do DSP, formato BRR) ou os chips de cartucho (SA-1, Super FX, CX4, DSP-n, S-DD1, SPC7110). Também serve para perguntas como "qual bit liga o force blank", "por que minha escrita na VRAM sumiu", "quanto DMA cabe no vblank" ou "como faço um gradiente com HDMA".
 ---
 
 # snes-hardware
@@ -60,9 +60,12 @@ Toda afirmação técnica dos references tem fonte entre colchetes (`[fullsnes]`
 | [interrupcoes-e-timing.md](references/interrupcoes-e-timing.md) | Relógios, linha do tempo do quadro, NMI, IRQ de H/V, FastROM e SlowROM |
 | [controles.md](references/controles.md) | Auto-joypad, formato de JOYn, leitura manual |
 | [apu.md](references/apu.md) | SPC700, DSP, mapa da ARAM, portas $2140-$2143, protocolo de upload da IPL |
+| [spc700-e-brr.md](references/spc700-e-brr.md) | Registradores do DSP, formato BRR, diretório de samples e driver mínimo testado |
+| [chips-de-cartucho.md](references/chips-de-cartucho.md) | SA-1, GSU, CX4, DSP-n, S-DD1 e SPC7110: mapa, registradores essenciais e header |
 | [exemplos.md](references/exemplos.md) | Esqueleto LoROM em asar (init, DMA, NMI, controle) e tabela de HDMA |
+| [teste-console.asm](references/teste-console.asm) | ROM de teste para medir no console real HDMA ligado no meio do quadro, CGRAM no hblank e force blank no meio da linha |
 | [fontes.md](references/fontes.md) | Fontes com URL, autor, ano e confiança; divergências; o que ficou não confirmado |
 
 ## Fora do escopo
 
-Detalhe dos chips de cartucho (SA-1, SuperFX, DSP-n; o que cada um resolvia está em `snes-tecnicas/references/chips-especiais.md`), programação do driver de som no SPC700 e formato BRR em detalhe. HDMA ligado no meio do quadro, a janela da CGRAM e o force blank no meio da linha estão documentados como os emuladores de precisão fazem, sem medição em console real. O que não tem fonte confirmada está listado em [fontes.md](references/fontes.md).
+Conjunto de instruções interno dos chips de cartucho (o que cada um resolvia está em `snes-tecnicas/references/chips-especiais.md`) e driver de som completo (sequenciador, eco, música). HDMA ligado no meio do quadro, a janela da CGRAM e o force blank no meio da linha estão documentados como os emuladores de precisão fazem, sem medição em console real; a ROM para medir está em [teste-console.asm](references/teste-console.asm). O que não tem fonte confirmada está listado em [fontes.md](references/fontes.md).
