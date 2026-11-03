@@ -1,5 +1,9 @@
 # Mudanças
 
+## [Não lançado]
+
+- **snes-testes**: Mesen rodado de verdade (print no terminal, `allowIoOsAccess`, chaves do `emu.getState()`, executável por sistema, receita conferida e exemplo de PowerShell corrigido para esperar o processo); FXPAK, usb2snes, Super EverDrive e snes9x com fonte oficial ou comparação registrada.
+
 ## v0.1
 
 Primeira versão, com sete skills pesquisadas em fontes primárias (fullsnes, SNESdev wiki, documentos do anomie, datasheet da WDC, manual do asar, código do Mesen e do bsnes), cada uma com o seu `references/fontes.md`.

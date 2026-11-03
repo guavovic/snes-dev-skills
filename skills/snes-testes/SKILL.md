@@ -5,7 +5,7 @@ description: Testar ROM e ROM hack de Super Nintendo (SNES / Super Famicom), em 
 
 # snes-testes
 
-Como provar que uma ROM ou um hack funciona: teste automático no Mesen, escolha de emulador e teste no console. Este arquivo traz as regras e o índice; opções, API e receitas ficam em `references/`. Nenhum executável foi rodado na pesquisa desta skill: nomes de opção e de função vêm do código-fonte do Mesen, e o comportamento descrito é o que o código faz.
+Como provar que uma ROM ou um hack funciona: teste automático no Mesen, escolha de emulador e teste no console. Este arquivo traz as regras e o índice; opções, API e receitas ficam em `references/`. Nomes de opção e de função vêm do código-fonte do Mesen; o que está marcado [Teste local] foi conferido rodando o MesenCE 2.2.1 no Windows com uma ROM própria.
 
 ## Regras de ouro
 
@@ -14,8 +14,9 @@ Como provar que uma ROM ou um hack funciona: teste automático no Mesen, escolha
 3. **Teste em emulador preciso antes de chamar de pronto.** Mesen é apontado como provavelmente o mais preciso hoje [SNESdev Tools]; bsnes e ares descendem da linha de precisão do higan [bsnes][ares]. ZSNES fica fora: prioriza velocidade e esconde bug que quebra no console [ZSNES wiki]. Ver `references/emuladores.md`.
 4. **Ligue o estado inicial aleatório da RAM no teste.** No Mesen, `--snes.ramPowerOnState=Random` faz a RAM começar com lixo, o que expõe variável lida antes de ser escrita [MesenCE src]. O console real também não começa zerado; os detalhes do hardware estão em `snes-hardware`.
 5. **Um quadro, uma decisão.** Leia a RAM e decida no callback de fim de quadro, com uma flag que impede chamar `emu.stop` duas vezes. O stop é assíncrono e o primeiro código diferente de zero vence [MesenCE src].
-6. **Entrada simulada vai no `inputPolled`.** `emu.setInput` vale até o próximo `inputPolled`, e a documentação recomenda chamá-lo dentro desse callback [MesenCE src].
-7. **Console real no fim, não no começo.** Flash cart testa timing e hardware de verdade, mas tem limites: save state só em jogo sem chip especial no SD2SNES/FXPAK [sd2snes CHANGELOG], e suporte a chip varia por modelo. Ver `references/console-real-flashcart.md`.
+6. **No PowerShell, espere o processo.** O Mesen é aplicativo gráfico: `& Mesen.exe ...` volta na hora sem código de saída. Use `Start-Process -Wait -PassThru -NoNewWindow` e leia `.ExitCode` [Teste local].
+7. **Entrada simulada vai no `inputPolled`.** `emu.setInput` vale até o próximo `inputPolled`, e a documentação recomenda chamá-lo dentro desse callback [MesenCE src].
+8. **Console real no fim, não no começo.** Flash cart testa timing e hardware de verdade, mas tem limites: save state só em jogo sem chip especial no SD2SNES/FXPAK [sd2snes CHANGELOG], e suporte a chip varia por modelo. Ver `references/console-real-flashcart.md`.
 
 ## Teste mínimo
 
@@ -23,16 +24,16 @@ Como provar que uma ROM ou um hack funciona: teste automático no Mesen, escolha
 Mesen.exe --testRunner teste.lua hack.sfc --timeout=30 --snes.ramPowerOnState=Random
 ```
 
-Código de saída: o que o script passou para `emu.stop`, ou -1 em timeout, ROM que não carregou ou número errado de ROMs [MesenCE src]. Script completo e receita com asar em `references/receita-teste-automatizado.md`.
+Código de saída: o que o script passou para `emu.stop`, ou -1 em timeout, ROM que não carregou ou número errado de ROMs [MesenCE src][Teste local]. O executável é `Mesen.exe` no Windows e `Mesen` no Linux e no macOS [MesenCE releases]. Script completo e receita com asar em `references/receita-teste-automatizado.md`.
 
 ## Armadilhas
 
-- **Script sem `io` nem `os`.** Por padrão o Lua do Mesen roda sem as bibliotecas `io`, `os` e `package`; gravar arquivo exige liberar o acesso nas configurações do script [MesenCE src]. Use o código de saída e `print` para o resultado.
+- **Script sem `io` nem `os`.** Por padrão o Lua do Mesen roda sem as bibliotecas `io`, `os` e `package`. `--debug.scriptWindow.allowIoOsAccess=true` libera as três, mas caminho relativo cai na pasta home do Mesen, não na sua [MesenCE src][Teste local]. Para o resultado, código de saída e `print` bastam.
 - **Callback demorado.** Cada execução de script tem limite de 1 segundo por padrão (`ScriptTimeout`); passar disso gera erro [MesenCE src]. Nada de laço longo dentro do callback.
-- **`emu.log` não vai pro terminal.** Ele escreve na janela de log do script. `print` é o do Lua e escreve na saída padrão do processo; se o seu terminal no Windows mostra essa saída não foi confirmado [MesenCE src].
+- **`emu.log` não vai pro terminal.** Ele escreve na janela de log do script. `print` é o do Lua e escreve na saída padrão do processo, que aparece no terminal do Windows e pode ser redirecionada para arquivo [MesenCE src][Teste local].
 - **Savestate por script tem lugar certo.** `emu.createSavestate` e `emu.loadSavestate` só funcionam dentro de um callback de execução (`exec`) da CPU principal [MesenCE src].
 - **Mesen 2 arquivado.** O repositório original foi arquivado e o desenvolvimento segue no MesenCE; a documentação em mesen.ca é da versão antiga de NES [Mesen2 src][MesenCE src].
-- **Nome de chave do `emu.getState()` muda.** Prefira `emu.read` em endereço de RAM combinado a depender de chave de estado [MesenCE src].
+- **`emu.getState()` é plano e muda entre versões.** A chave tem o caminho no nome (`s["cpu.pc"]`, não `s.cpu.pc`) e o código atual já acrescentou chave que a 2.2.1 não tem. Prefira `emu.read` em endereço de RAM combinado a depender de chave de estado [MesenCE src][Teste local].
 - **Teste que passa no emulador e falha no console.** Acesso a VRAM fora do vblank e DMA no momento errado são clássicos; confira as regras em `snes-hardware` e as opções de parada do debugger em `snes-desmontagem`.
 
 ## Índice de referências
