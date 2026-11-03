@@ -1,6 +1,6 @@
 # Exemplos em asar
 
-Código original, escrito para esta skill, na sintaxe do asar. Todos os trechos foram montados no asar 1.91 e rodados no Mesen 2.2.1 (modo `--testRunner`, numa ROM vazia própria, com scripts Lua que conferem registradores, memória e capturas de tela) em 02/11/2026 [Teste local]; o que foi conferido em cada um está na última seção. Cada trecho aplica regras dos outros references, onde está a fonte. O init e o esqueleto LoROM completo estão em snes-hardware/references/exemplos.md; estes trechos se encaixam nele.
+Código original, escrito para esta skill, na sintaxe do asar. Todos os trechos foram montados no asar 1.91 e rodados no Mesen 2.2.1 (modo `--testRunner`, numa ROM vazia própria, com scripts Lua que conferem registradores, memória e capturas de tela) em 02/11/2026, e o de paleta em 03/11/2026 [Teste local]; o que foi conferido em cada um está na última seção. Cada trecho aplica regras dos outros references, onde está a fonte. O init e o esqueleto LoROM completo estão em snes-hardware/references/exemplos.md; estes trechos se encaixam nele.
 
 Convenções: código no banco `$00` (LoROM, `org $008000`), DB = `$00`, variáveis na WRAM baixa, X e Y em 16 bits o tempo todo.
 
@@ -24,10 +24,20 @@ Cuidado com expressões no asar 1.91: sem `asar 1.90` no topo do arquivo (com do
 !foco_y         = $003A     ; 2 bytes
 !tmp            = $003C
 !coldata_sombra = $003E     ; 1 byte: valor que a NMI escreve em $2132
+!pal_alvo       = $48       ; 2 bytes: paleta alvo no banco $00 (0 = parada); 8 bits por causa do (dp),y
+!pal_espera     = $004A     ; 1 byte: quadros até o próximo passo
+!pal_mudou      = $004C     ; 2 bytes: canais que mudaram neste passo
+!pal_enviar     = $004E     ; 1 byte: a NMI sobe a cópia da CGRAM
+!cor_alvo       = $0050     ; 2 bytes
+!cor_atual      = $0052     ; 2 bytes
+!canal          = $0054     ; 2 bytes
+!pal_indice     = $0056     ; 2 bytes: byte da cópia onde o passo parou
 
 !fila           = $0300     ; entradas de 8 bytes
 !fila_max       = 16
 !limite_dma     = 4096      ; bem abaixo dos ~6 KB do vblank NTSC
+!pal_copia      = $1000     ; 512 bytes: cópia de trabalho da CGRAM
+!pal_intervalo  = 32        ; quadros entre um passo e outro
 !hdma_onda      = $0400     ; 451 bytes
 !hdma_foco      = $0600     ; 451 bytes
 !raio           = 48
@@ -384,6 +394,126 @@ fade_branco:
 
 Para voltar do branco, desça a intensidade até `$E0` com a cena nova já carregada. Um passo por quadro leva 31 quadros, meio segundo no NTSC; para ir mais rápido, some 2 por quadro e limite em 31.
 
+## Paleta de hora do dia: um passo por canal até a paleta alvo
+
+O caminho que a desmontagem do Harvest Moon descreve (ver [cor-e-transicoes.md](cor-e-transicoes.md)): a paleta de cada momento do dia vem pronta, a cópia de trabalho da CGRAM fica na WRAM e, a cada intervalo, cada canal de cada cor anda um passo em direção à paleta alvo; quando nada muda, a transição acabou [HM-Decomp][HarvestMoonSnesDecomp: GUIDE]. O código abaixo é nosso e só segue essa descrição. Cor em BGR555: vermelho nos bits 0-4, verde nos 5-9, azul nos 10-14 [SNESdev wiki: CGRAM].
+
+```asm
+mascara_canal:  dw $001F, $03E0, $7C00  ; vermelho, verde, azul
+passo_canal:    dw $0001, $0020, $0400  ; 1 de intensidade em cada canal
+
+; A em 16 bits = endereço da paleta alvo (512 bytes) no banco $00.
+comeca_paleta:
+    rep #$20
+    sta !pal_alvo
+    sep #$20
+    lda #!pal_intervalo
+    sta !pal_espera
+    rts
+
+; Uma vez por quadro de lógica, X e Y em 16 bits. Carry 1 quando não há transição.
+; Cada passo é feito em 8 fatias de 32 cores, uma por quadro.
+passo_paleta:
+    rep #$20
+    lda !pal_alvo
+    bne .anda
+    sep #$20
+    sec
+    rts
+.anda:
+    sep #$20
+    dec !pal_espera
+    bne .meio
+    lda #!pal_intervalo
+    sta !pal_espera
+    rep #$20
+    stz !pal_mudou
+    stz !pal_indice
+    bra .fatia
+.meio:
+    rep #$20
+    lda !pal_indice
+    beq .seguindo           ; nenhum passo em andamento
+.fatia:
+    ldy !pal_indice
+.cor:
+    lda (!pal_alvo),y
+    sta !cor_alvo
+    lda !pal_copia,y
+    sta !cor_atual
+    ldx #$0000
+.canal:
+    lda !cor_alvo
+    and mascara_canal,x
+    sta !canal
+    lda !cor_atual
+    and mascara_canal,x
+    cmp !canal
+    beq .igual
+    lda !cor_atual
+    bcc .sobe               ; canal atual abaixo do alvo
+    sec
+    sbc passo_canal,x
+    bra .grava
+.sobe:
+    adc passo_canal,x       ; carry já está em 0
+.grava:
+    sta !cor_atual
+    inc !pal_mudou
+.igual:
+    inx
+    inx
+    cpx #$0006
+    bne .canal
+    lda !cor_atual
+    sta !pal_copia,y
+    iny
+    iny
+    tya
+    and #$003F
+    bne .cor                ; fim da fatia a cada 64 bytes
+    sty !pal_indice
+    cpy #$0200
+    bne .seguindo
+    stz !pal_indice         ; passo completo: decide se sobe ou se acabou
+    lda !pal_mudou
+    beq .acabou
+    sep #$20
+    lda #$01
+    sta !pal_enviar
+.seguindo:
+    sep #$20
+    clc
+    rts
+.acabou:
+    stz !pal_alvo
+    sep #$20
+    sec
+    rts
+
+; Na NMI, depois da fila de DMA (A em 8 bits, X em 16):
+envia_paleta:
+    lda !pal_enviar
+    beq .nada
+    stz $2121               ; CGADD: começa na cor 0
+    stz $4300               ; DMAP: um registrador, A-bus subindo
+    lda #$22
+    sta $4301               ; BBAD: CGDATA
+    ldx.w #!pal_copia
+    stx $4302
+    lda #$7E
+    sta $4304               ; a cópia está no banco $7E
+    ldx #$0200
+    stx $4305
+    lda #$01
+    sta $420B
+    stz !pal_enviar
+.nada:
+    rts
+```
+
+Com intervalo de 32 quadros e um canal que precisa andar 31 passos, a troca inteira leva 31 x 32 = 992 quadros, uns 16 segundos no NTSC; é a conta que o guia da desmontagem faz para o jogo [HarvestMoonSnesDecomp: GUIDE]. A divisão em fatias é nossa: no Mesen, as 256 cores de uma vez custaram uns 67 mil ciclos de CPU, mais de um quadro, e cada passo gerava um quadro de lag; em fatias de 32 cores, cada quadro gasta uns 8,5 mil ciclos e o lag some [Teste local]. Os 512 bytes do DMA entram no orçamento do vblank junto da fila (ver [estrutura-do-jogo.md](estrutura-do-jogo.md)). Para não tocar nas cores da caixa de texto, ou para mexer só na metade dos BGs, comece e termine o laço `.cor` em outro índice: o Harvest Moon deixa de fora as primeiras cores e só passa a mexer nos sprites à noite [HarvestMoonSnesDecomp: GUIDE].
+
 ## Mode 7 em perspectiva: padrão 3 com dois registradores por canal
 
 M7A/M7B (`$211B/$211C`) e M7C/M7D (`$211D/$211E`) são vizinhos e de escrita dupla. O padrão 3 escreve `xx, xx, xx+1, xx+1`, então um canal leva os 2 bytes de M7A e os 2 de M7B por linha, e outro canal leva M7C e M7D [fullsnes]. É o que faz o Dizworld de Brad Smith (DMAP `$43`: padrão 3 em modo indireto, destinos `$1B` e `$1D`) [Dizworld]. Aqui a câmera é fixa, sem rotação, e a tabela sai pronta da ROM, gerada pelo próprio asar: a escala de cada linha cai com a distância até o topo, o que dá um chão em perspectiva.
@@ -472,6 +602,7 @@ Teste de 02/11/2026, asar 1.91 e Mesen 2.2.1, RAM ligada com valores aleatórios
 - **Foco de luz**: na captura, as linhas 64 a 160 têm a luz, a linha 112 fica clara de x = 80 a 176 e o resto sai em 19/31 do brilho, como a subtração pede.
 - **Fade de saída**: brilho de 15 a 0, depois `$8F` parado e carry 1 (já com a correção do `bmi .pronto`).
 - **Fade para branco**: com fundo azul escuro, a cor sobe quadro a quadro e chega em branco puro (255, 255, 255) na captura, com a sombra em `$FF` e carry 1.
+- **Paleta de hora do dia** (teste de 03/11/2026): com uma paleta de dia e outra de noite geradas pelo asar, a CGRAM bateu cor a cor com a de dia no início, com um passo por canal no quadro 40, dois no 104 e a de noite inteira no fim; a transição parou sozinha (carry 1, `!pal_alvo` em 0), a cor 1 mudou de 32 em 32 quadros e o contador de lag ficou em 0. A versão sem fatias, com as 256 cores num quadro só, levava uns 67 mil ciclos e somava um quadro de lag por passo.
 - **Mode 7**: 448 escritas em cada um de `$211B` a `$211E` por quadro; a matriz de cada linha bate com a tabela e, na captura, os quadrados do chão vão de 2 pixels de largura no topo a 30 no fim, a perspectiva esperada.
 - **Medidor**: com uma lógica de 6000 voltas de `dex`/`bne`, `$2132` recebeu o vermelho na linha 130 e a captura fica vermelha exatamente a partir dela.
 

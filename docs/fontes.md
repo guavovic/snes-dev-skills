@@ -37,6 +37,8 @@ Documentos usados nas skills, com o que cada um cobre e o quanto é confiável. 
 | [OpenSNES: profile.h](https://k0b3n4irb.github.io/opensnes/profile_8h.html) | projeto OpenSNES | Medidor de quadro com a cor fixa no backdrop | Média |
 | [sneslab](https://sneslab.net/wiki/) | comunidade sneslab | Uso dos canais de DMA em Super Mario World e gráficos dinâmicos | Média |
 | [Using DMA effectively](https://wiki.superfamicom.org/using-dma-effectively) | comunidade superfamicom.org | Streaming de quadros de animação com limite por quadro | Média |
+| [HM-Decomp](https://github.com/ElisaS-Codes/HM-Decomp) | ElisaS-Codes e DasK | Mapa de bancos e de RAM da desmontagem do Harvest Moon: rotinas e tabela da paleta por hora do dia (só os nomes e endereços) | Média |
+| [HarvestMoonSnesDecomp](https://github.com/RodoLy/HarvestMoonSnesDecomp) | Rodrigo (RodriLoy) | Guia da reimplementação em C do Harvest Moon: como o jogo troca a paleta com a hora e a estação (só o texto do guia) | Média/alta |
 
 ## Por skill
 
