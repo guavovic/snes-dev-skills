@@ -27,15 +27,25 @@ Fonte: entrevista publicada pelo GameBusiness.jp em 16/09/2017 [GameBusiness.jp:
 
 ## Em japonês
 
-Foi procurado relato técnico em japonês de programadores da época (blogs, palestras, entrevistas). **Nada confiável foi achado** para citar:
+### F-ZERO: o experimento de Mode 7 (entrevista da Nintendo, 2017)
+
+Na série de entrevistas de lançamento do Nintendo Classic Mini: Super Famicom, publicada em japonês no site da Nintendo, a equipe de F-ZERO (Shimizu, Nishida e Imamura) conta como o jogo nasceu [Nintendo JP: F-ZERO]:
+
+- Os programadores novos recebiam cada um um tema de experimento com as funções do Super Famicom, e o tema de Nishida era uma corrida usando o Mode 7. Ele explica que o console tinha os modos 0 a 7 e que o 7 era o que fazia "背景の拡大・縮小・回転" (ampliar, reduzir e girar o fundo).
+- Shimizu descreve a demo: girar cerca de quatro quintos de baixo da tela e mostrar a paisagem distante no quinto de cima. É a divisão que esta skill descreve em [hdma-efeitos.md](hdma-efeitos.md): chão em Mode 7 e outra coisa acima do horizonte.
+- Os carros eram sprites desenhados à mão, um por um, em vários ângulos, porque ainda não havia polígonos; rodas animadas multiplicariam o número de desenhos, e por isso as naves flutuam sem rodas. O mesmo motivo de memória aparece no relato de Super Mario Kart [Iwata Asks: Mario Kart Wii].
+
+Na entrevista de Super Mario Kart da mesma série, Sugiyama diz que o console se vendia por "ampliar, reduzir e girar" e que a equipe penou para transformar essa função em jogo [Nintendo JP: Super Mario Kart].
+
+É relato de memória, mais de 25 anos depois, e não documento técnico: serve para o porquê das escolhas, não para detalhe de registrador.
+
+### O que foi descartado
 
 - Uma apresentação no Speaker Deck (kent-hamaguchi, 2019) fala de desenvolvimento para Super Famicom, mas é de autor recente e não de programador da época: baixa confiança, não usada para afirmação técnica.
 - Um texto no kakuyomu foi descartado (ficção ou relato sem fonte).
 
-Fica como lacuna: se aparecer uma entrevista de época (por exemplo de revista japonesa digitalizada), ela entra aqui com a citação original e a tradução.
-
 ## Leitura recomendada (não transcrita)
 
-A série "Super NES Features" do canal Retro Game Mechanics Explained (Objects, Color Math, Lag & Blanking, DMA & HDMA, Mode 7) é listada pelo sneslab.net como boa explicação visual [RGME]. O conteúdo dos vídeos **não foi transcrito nem conferido** para esta skill; nenhuma afirmação daqui depende deles.
+A série "Super NES Features" do canal Retro Game Mechanics Explained (Objects, Color Math, Lag & Blanking, DMA & HDMA, Mode 7) é listada pelo sneslab.net como boa explicação visual [RGME]. O conteúdo dos vídeos **não foi transcrito nem conferido** para esta skill; nenhuma afirmação daqui depende deles. Em 02/11/2026 foi procurada transcrição ou descrição detalhada dos vídeos e só se achou a descrição curta de cada um; como o que eles explicam (OAM, color math, DMA e HDMA, Mode 7) já está coberto por [fullsnes] e pela [SNESdev wiki: HDMA examples], eles ficam só como leitura.
 
 Related: [chips-especiais.md](chips-especiais.md), [hdma-efeitos.md](hdma-efeitos.md), [fontes.md](fontes.md)

@@ -67,7 +67,7 @@ Não foi achado documento primário de um estúdio da época descrevendo o seu s
 - NTSC: 262 linhas, vblank a partir da linha 225 (37 linhas de vblank com 224 visíveis). São 357.368 master clocks por quadro, 346.888 disponíveis para a CPU depois do refresh da DRAM [SNESdev wiki: Timing].
 - A CPU acessa memória a 6, 8 ou 12 master clocks (3,58 / 2,68 / 1,79 MHz) conforme a região [SNESdev wiki: Timing][fullsnes]. Ciclos por instrução e otimizações em snes-assembly/references/desempenho.md.
 - **Lag** é o quadro em que a lógica não terminou antes da NMI: a NMI não transfere, a tela repete o quadro anterior e o mundo anda mais devagar. É o slowdown visível nos jogos da época. Com a flag de quadro pronto ele aparece no contador de lag [SNESdev wiki: VBlank routine].
-- Para ver onde o tempo vai, uma técnica conhecida é mudar o brilho ou a cor de fundo no começo e no fim da lógica e olhar a faixa na tela (**não confirmado** em fonte primária; o profiler de um emulador mostra o mesmo de forma direta).
+- Para ver onde o tempo vai, mude a cor de fundo quando a lógica termina e volte na NMI: a altura da faixa mostra quanto do quadro a lógica usou. O jeito seguro é somar a cor fixa só no backdrop, porque a cor 0 da CGRAM não aceita escrita segura no meio da tela [fullsnes]; é o método discutido no fórum do NESdev (brilho, cor 0, cor fixa ou leitura da linha por SLHV) [NESdev BBS: CPU usage meter] e o que a biblioteca OpenSNES usa [OpenSNES: profile.h]. Exemplo testado em [exemplos.md](exemplos.md) [Teste local]. O profiler de um emulador mostra o mesmo de forma direta.
 
 ## Vblank estendido (letterbox)
 

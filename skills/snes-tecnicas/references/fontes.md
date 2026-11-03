@@ -1,6 +1,6 @@
 # Fontes
 
-Consultadas em 26/10/2026. No texto, cada afirmação leva o rótulo entre colchetes. Detalhes de registrador que esta skill só aponta foram conferidos nas fontes das skills snes-hardware, snes-graficos e snes-assembly (ver o `fontes.md` de cada uma).
+Consultadas em 26/10/2026; as da v0.2 em 02/11/2026. No texto, cada afirmação leva o rótulo entre colchetes. Detalhes de registrador que esta skill só aponta foram conferidos nas fontes das skills snes-hardware, snes-graficos e snes-assembly (ver o `fontes.md` de cada uma).
 
 | Rótulo | Fonte | Autor | Ano | Cobre | Confiança |
 |---|---|---|---|---|---|
@@ -29,6 +29,14 @@ Consultadas em 26/10/2026. No texto, cada afirmação leva o rótulo entre colch
 | [GameBusiness.jp: Super Metroid] | https://www.gamebusiness.jp/article/2017/09/16/13439.html | GameBusiness.jp | 16/09/2017 | Primeiro ano de Super Metroid gasto pesquisando o hardware | Média: imprensa, em japonês |
 | [RGME] | https://sneslab.net/wiki/Retro_Game_Mechanics_Explained | sneslab.net, sobre o canal Retro Game Mechanics Explained | consultada em 2026 | Lista dos vídeos "Super NES Features" | Baixa para esta skill: vídeos não transcritos, só leitura recomendada |
 | [Speaker Deck: kent-hamaguchi] | https://speakerdeck.com/kenthamaguchi/how-to-make-snes-rom | kent-hamaguchi | 2019 | Desenvolvimento para Super Famicom hoje | Baixa: autor recente; não usada para afirmação |
+| [Nintendo JP: F-ZERO] | https://topics.nintendo.co.jp/c/article/0e9c42d3-7d8a-11e7-8cda-063b7ac45a6d.html (hoje fora do ar; cópia em https://web.archive.org/web/20191213044242/https://topics.nintendo.co.jp/c/article/0e9c42d3-7d8a-11e7-8cda-063b7ac45a6d.html) | Nintendo, com Shimizu, Nishida e Imamura | 2017 | Experimento de Mode 7 que virou F-ZERO, chão girando com paisagem em cima, carros desenhados em vários ângulos | Alta para o relato; em japonês, memória de desenvolvedor |
+| [Nintendo JP: Super Mario Kart] | https://topics.nintendo.co.jp/c/article/3228ce3a-8d29-11e7-8cda-063b7ac45a6d.html (cópia em https://web.archive.org/web/20191213045717/https://topics.nintendo.co.jp/c/article/3228ce3a-8d29-11e7-8cda-063b7ac45a6d.html) | Nintendo, com Sugiyama e Konno | 2017 | Esforço para usar ampliar, reduzir e girar no jogo | Alta para o relato; em japonês |
+| [NESdev BBS: CPU usage meter] | https://nesdev.nes.science/f12/t12419.xhtml (cópia do tópico "SNES CPU usage meter" do fórum NESdev) | fórum NESdev | 23 e 24/02/2015 | Medir o quadro por brilho, cor 0, cor fixa ou leitura da linha por SLHV/OPVCT | Média: fórum, com autores experientes; confere com [fullsnes] |
+| [OpenSNES: profile.h] | https://k0b3n4irb.github.io/opensnes/profile_8h.html | projeto OpenSNES | consultada em 2026 | Medidor de quadro somando a cor fixa no backdrop | Média: biblioteca atual, não da época; confirma o método |
+| [sneslab: DMA channel usage in SMW] | https://sneslab.net/wiki/DMA_channel_usage_in_SMW | comunidade sneslab | consultada em 2026 | Canal 2 de DMA sobe os gráficos do jogador em Super Mario World | Média: documentação de fãs a partir da desmontagem |
+| [sneslab: Dynamic X] | https://sneslab.net/wiki/Dynamic_X | comunidade sneslab | consultada em 2026 | O jogo original sobe gráficos do jogador, Yoshi e podoboos sempre; a biblioteca só quando precisa | Média: documentação de fãs |
+| [Superfamicom wiki: Using DMA effectively] | https://wiki.superfamicom.org/using-dma-effectively | comunidade superfamicom.org | consultada em 2026 | Comparar quadro pedido com o carregado, animação a 30 quadros, limite de DMA por quadro | Média: wiki técnica sem autor |
+| [Teste local] | Montagem no asar 1.91 e execução no Mesen 2.2.1 (`--testRunner`, ROM vazia própria, scripts Lua) | feito para esta skill | 02/11/2026 | Todos os trechos de exemplos.md, o bug do fade de saída e a conta da esquerda para a direita do asar | Alta para o comportamento no emulador; não é hardware real |
 
 As 5 fontes principais: [SNESdev wiki] (várias páginas), [fullsnes], [undisbeliever], [Dizworld] e [bsnes].
 
@@ -42,14 +50,18 @@ As 5 fontes principais: [SNESdev wiki] (várias páginas), [fullsnes], [undisbel
 ## Não confirmado ou fora do escopo
 
 - **Atores e máquina de estados**: não foi achado documento de estúdio da época descrevendo o seu sistema de objetos; o padrão está como arquitetura comum, sem atribuir a jogo.
-- **Paleta de hora do dia e estação**: a técnica (cópia da CGRAM na WRAM, recalcular, DMA) é consequência das fontes, mas qual jogo comercial usava cada caminho não foi confirmado.
-- **Streaming de quadros de animação**: decorre do orçamento de DMA; nenhum jogo específico confirmado.
-- **Mode 7 com padrão 3 cobrindo dois registradores por canal**: dedução da tabela de padrões, sem exemplo publicado conferido.
-- **Fade para branco por color math**: dedução do funcionamento da soma, sem exemplo publicado conferido.
-- **Medir o quadro mudando a cor de fundo**: técnica conhecida, sem fonte primária.
-- **Relato técnico em japonês de programador da época**: nada confiável achado. Um texto no kakuyomu (https://kakuyomu.jp/users/meikjy/news/16818093084663682415) foi descartado.
-- **Vídeos do Retro Game Mechanics Explained**: só indicados, conteúdo não usado.
-- **Exemplos em asar**: escritos à mão e não montados.
-- Página "Tricks" da SNESdev wiki: deu 404 na consulta, não usada.
+- **Paleta de hora do dia e estação**: a técnica (cópia da CGRAM na WRAM, recalcular, DMA, ou tinta pela cor fixa) é consequência das fontes, mas qual jogo comercial usava cada caminho não foi confirmado. Pendente na issue #35.
+- **Vídeos do Retro Game Mechanics Explained**: sem transcrição achada; ficam só como leitura, porque o conteúdo já está coberto por [fullsnes] e pela [SNESdev wiki].
+- **Página "Tricks" da SNESdev wiki**: deu 404 em 2026; em 02/11/2026 a busca no site e no índice do archive.org (prefixo `snes.nesdev.org/wiki/Trick`) só achou outra página ("Tricky-to-emulate games"). Não há cópia arquivada, então foi descartada.
+- Um texto no kakuyomu (https://kakuyomu.jp/users/meikjy/news/16818093084663682415) foi descartado como relato em japonês.
+
+## Resolvido na v0.2
+
+- **Exemplos em asar**: montados e testados no Mesen [Teste local]; o fade de saída tinha um bug e foi corrigido.
+- **Mode 7 com padrão 3 em dois registradores por canal**: [fullsnes], [Dizworld] e [Teste local].
+- **Fade para branco por color math**: [fullsnes], [SNESdev wiki: Color math] e [Teste local].
+- **Medir o quadro pela cor de fundo**: [NESdev BBS: CPU usage meter], [OpenSNES: profile.h] e [Teste local]. Não é fonte da época, mas o método está descrito e conferido.
+- **Streaming de quadros de animação**: caso de Super Mario World [sneslab: DMA channel usage in SMW][sneslab: Dynamic X] e o método de [Superfamicom wiki: Using DMA effectively].
+- **Relato técnico em japonês**: entrevistas de 2017 da Nintendo [Nintendo JP: F-ZERO][Nintendo JP: Super Mario Kart].
 
 Related: [../SKILL.md](../SKILL.md)

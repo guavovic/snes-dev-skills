@@ -37,7 +37,7 @@ Técnica: guardar a paleta "de base" na ROM e uma cópia de trabalho da CGRAM (5
 - Alternativa sem recalcular: tinta por color math com a cor fixa (seção anterior), barata e global, mas afeta tudo por igual e esbarra nos limites do color math.
 - Estação também pode trocar tiles (neve no chão, folhas), por streaming (ver [streaming-e-scroll.md](streaming-e-scroll.md)).
 
-Quais jogos da época usavam cada caminho para hora do dia ou estação **não foi confirmado** em fonte técnica; fica como técnica, sem atribuir a jogo.
+Quais jogos da época usavam cada caminho para hora do dia ou estação **não foi confirmado** em fonte técnica; fica como técnica, sem atribuir a jogo. A busca de 02/11/2026 achou a técnica descrita (tinta por cor fixa, degradê de COLDATA por HDMA [SNESdev wiki: Color math]) e tabelas de paleta separadas por cenário em mapas de ROM de fãs, mas nenhum texto que explique o caminho de um jogo para a passagem do tempo.
 
 ## Fade de brilho
 
@@ -45,7 +45,7 @@ Quais jogos da época usavam cada caminho para hora do dia ou estação **não f
 - **Brilho 0 não é preto garantido**: termine o fade com force blank (bit 7) antes de mexer em VRAM ou trocar a cena [undisbeliever][fullsnes].
 - **Glitch de INIDISP**: o PPU pode reagir a um valor que passa no barramento antes da escrita de verdade. A saída recomendada é escrever por endereço longo cujo banco é o próprio valor: `sta $802100` para ligar o force blank (com A = `$80`) e `sta $0f2100` para desligar (com A = `$0F`) [undisbeliever]. Isso exige que o banco `$80` ou `$0F` espelhe os registradores, o que vale nos bancos `$00-$3F` e `$80-$BF` (snes-hardware/references/mapa-de-memoria.md).
 - No console de placa 1-CHIP, ligar o force blank com `$80` e depois sair com `$0F` dá uma faixa de degradê com glitch; mantenha os bits de brilho ligados no valor de force blank (`$8F`) [undisbeliever].
-- Fade para branco não sai do brilho mestre. Uma saída é color math somando a cor fixa a tudo e subindo COLDATA até o branco; é dedução do funcionamento da soma [SNESdev wiki: Color math], sem exemplo publicado conferido.
+- Fade para branco não sai do brilho mestre. A saída é color math somando a cor fixa a tudo (CGWSEL `$00`, CGADSUB `$3F`) e subindo a intensidade de COLDATA com os três canais ligados até 31, onde cada canal satura [fullsnes]. No exemplo de névoa no horizonte, a wiki nota que trocar a soma pela subtração leva ao preto em vez do branco [SNESdev wiki: Color math]. O exemplo de [exemplos.md](exemplos.md) chegou ao branco puro no Mesen [Teste local]. Sprite com paleta 0-3 fica fora e não clareia [fullsnes].
 
 ## Mosaico
 
