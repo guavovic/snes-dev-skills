@@ -94,3 +94,26 @@ Avisos do [ca65] que valem pra qualquer montador: `.smart` acompanha REP/SEP pel
 Erro da documentação do WLA-DX: o exemplo de `.ACCU 16` em `asmdiv.rst` mostra `AND #6` como `$29 $00 $06`, mas o código (`phase_4.c`) grava o imediato de 16 bits em little-endian, o que dá `$29 $06 $00` [WLA-DX código].
 
 Ainda sem confirmação: `COP` sem operando no WLA-DX. A tabela `i65816.c` guarda o valor $0200, que gravado em little-endian sairia `00 02` (opcode errado); o WLA-DX não foi executado aqui. Escreva sempre `COP $xx` com assinatura.
+
+## 11. Conta sem precedência no asar 1.x
+
+**Sintoma**: tamanho de tabela, endereço calculado ou constante sai com outro valor; o asar monta, só mostra um aviso `Wfeature_deprecated` com "xkas style left to right math".
+**Causa**: por compatibilidade com o xkas, o asar 1.x faz a conta da esquerda para a direita, sem precedência de operador (`math pri off` é o padrão). `2+3*4` dá 20 e `$1000+1*$200` dá `$200200` em vez de `$1200` [asar]. O asar 2.0 vai deixar só a conta com precedência [asar].
+**Conserto**:
+- **Convenção desta coleção: parênteses sempre que a expressão mistura operadores** (`$1000+(1*$200)`, `(!largura*!altura)/2`). Com parênteses o valor é o mesmo com e sem `asar 1.90`, então o trecho funciona colado em qualquer projeto.
+- Num projeto novo, escreva `asar 1.90` no **topo** do arquivo principal. Isso liga a precedência e também desliga o arredondamento no meio da conta (`math round off`) para o patch inteiro, inclusive os arquivos do `incsrc` [asar código].
+- O número da versão tem dois dígitos depois do ponto: `asar 1.9` dá erro `Einvalid_version_number`; `asar 1.90` e `asar 1.91` valem [asar código]. Ele tem de vir antes de qualquer outro comando (comentário e linha em branco podem vir antes); depois de um comando, dá `Estart_of_file` [asar código].
+- O aviso só aparece quando as duas contas dão resultados diferentes: o asar calcula também com precedência e compara [asar código]. Trate o aviso como erro (`-werror`, que no 1.91 aborta a montagem): sem aviso, o valor é o mesmo nos dois modos, salvo a divisão (abaixo).
+- **Define é texto.** `!a = 1+2` seguido de `db !a*3` vira `db 1+2*3`: 9 sem `asar 1.90`, 7 com ele. Coloque o valor entre parênteses (`!a = (1+2)`) ou avalie na hora com `!a #= 1+2` [asar].
+- **Divisão muda sem aviso.** Sem `asar 1.90`, cada passo é truncado (`7/2*2` dá 6); com ele, só o resultado final (`7/2*2` dá 7). A comparação do aviso não pega essa diferença. Quando o truncamento importa, escreva `floor(7/2)*2` [asar].
+
+```asm
+db 2+3*4            ; 20 sem asar 1.90 (com aviso), 14 com asar 1.90
+db 2+(3*4)          ; 14 nos dois modos
+dw $1000+(1*$200)   ; $1200 nos dois modos
+db floor(7/2)*2     ; 6 nos dois modos
+```
+
+Conferido no asar 1.91 em 03/11/2026, numa ROM vazia própria [asar 1.91 (teste)]: sem `asar 1.90` o bloco gerou `14 0E 00 12 06` e um aviso só na primeira linha; com `asar 1.90` no topo, `0E 0E 00 12 06`. Um comentário e uma linha em branco antes do `asar 1.90` não atrapalharam, e `-werror` abortou a montagem por causa do aviso. No mesmo teste, `!a = 1+2` com `db !a*3` deu 9 e 7, `7/2*2` deu 6 e 7, e `asar 1.9` parou com `Einvalid_version_number`.
+
+Em 03/11/2026 todos os blocos de asar das sete skills foram conferidos atrás de expressão que mistura operadores sem parênteses, inclusive depois de expandir os defines: nenhum muda de valor com `asar 1.90`. Os que fazem conta em `snes-tecnicas` usam um operador só (`#8*!fila_max`) ou parênteses com operadores do mesmo nível (`!m7_k/(!l+16)` vira `256*64/(!l+16)`, igual nos dois modos).

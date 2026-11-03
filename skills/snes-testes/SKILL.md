@@ -34,6 +34,7 @@ Código de saída: o que o script passou para `emu.stop`, ou -1 em timeout, ROM 
 - **Savestate por script tem lugar certo.** `emu.createSavestate` e `emu.loadSavestate` só funcionam dentro de um callback de execução (`exec`) da CPU principal [MesenCE src].
 - **Mesen 2 arquivado.** O repositório original foi arquivado e o desenvolvimento segue no MesenCE; a documentação em mesen.ca é da versão antiga de NES [Mesen2 src][MesenCE src].
 - **`emu.getState()` é plano e muda entre versões.** A chave tem o caminho no nome (`s["cpu.pc"]`, não `s.cpu.pc`) e o código atual já acrescentou chave que a 2.2.1 não tem. Prefira `emu.read` em endereço de RAM combinado a depender de chave de estado [MesenCE src][Teste local].
+- **Callback de memória também dispara no DMA e no HDMA.** O `write` de `emu.addMemoryCallback` é chamado nas escritas da CPU e nas do DMA/HDMA (o `read`, nas leituras da tabela), e a função recebe só endereço e valor; `cpu.pc` mostra a instrução que foi interrompida, não quem escreveu. Para pegar só a CPU, filtre pela linha (`ppu.scanline`), use um callback `exec` no endereço do `STA` ou desligue o HDMA ($420C) no teste [MesenCE src][Teste local].
 - **Teste que passa no emulador e falha no console.** Acesso a VRAM fora do vblank e DMA no momento errado são clássicos; confira as regras em `snes-hardware` e as opções de parada do debugger em `snes-desmontagem`.
 
 ## Índice de referências
