@@ -1,6 +1,6 @@
 # Receita: teste automatizado de ROM hack
 
-Objetivo: um comando que monta o hack, roda no Mesen sem interface, confere a RAM e sai com 0 (passou) ou 1 (falhou). As funções e opções estão explicadas em [mesen-linha-de-comando-e-lua.md](mesen-linha-de-comando-e-lua.md). Nada aqui foi executado na pesquisa: a receita segue o código do Mesen [MesenCE src] e o build do asar descrito em `snes-rom-hack`.
+Objetivo: um comando que monta o hack, roda no Mesen sem interface, confere a RAM e sai com 0 (passou) ou 1 (falhou). As funções e opções estão explicadas em [mesen-linha-de-comando-e-lua.md](mesen-linha-de-comando-e-lua.md). A receita segue o código do Mesen [MesenCE src] e o build do asar descrito em `snes-rom-hack`. O script Lua abaixo foi rodado sem mudança no MesenCE 2.2.1 contra duas ROMs próprias de teste, uma que grava o valor combinado e outra que não grava [Teste local]; o resultado está em "Conferido em execução", no fim da seção do script.
 
 ## Ideia: um endereço de resultado
 
@@ -78,8 +78,20 @@ Notas sobre o script:
 
 - `0x1F00` em `snesWorkRam` é o offset na WRAM, ou seja `$7E1F00`, o mesmo endereço do fragmento asar.
 - Seguro o Start por 4 quadros porque muitos jogos só reagem à borda (soltou e apertou); quantos quadros o seu jogo precisa é coisa de conferir nele.
-- 1800 quadros são uns 30 segundos de jogo em NTSC; o `--timeout` em segundos reais deve ser folgado em relação a isso, mas como o test runner roda em velocidade máxima o tempo real costuma ser menor (não medido).
+- 1800 quadros são uns 30 segundos de jogo em NTSC; o `--timeout` em segundos reais deve ser folgado em relação a isso. Como o test runner roda em velocidade máxima, o tempo real é bem menor: ver abaixo.
 - Para checar a ROM certa, compare `emu.getRomInfo().fileSha1Hash` com o hash esperado e chame `terminar(1, ...)` se não bater.
+
+### Conferido em execução
+
+MesenCE 2.2.1, Windows 11, ROM LoROM de 32 KB que só inicializa a CPU e fica num laço [Teste local]:
+
+| ROM | `ramPowerOnState` | Saída | Código | Tempo real |
+|---|---|---|---|---|
+| Grava `$A5` em `$7E1F00` | `Random` e `AllZeros` | `ok no quadro 1` | 0 | cerca de 1 s |
+| Não grava | `Random` | `falhou: $7E1F00 = $0F depois de 1800 quadros` | 1 | cerca de 6 s |
+| Não grava | `AllZeros` | `falhou: $7E1F00 = $00 depois de 1800 quadros` | 1 | cerca de 6 s |
+
+O caso `Random` mostra o lixo inicial da RAM aparecendo no endereço (o valor muda a cada rodada: outra deu `$3C`), que é o motivo da regra de rodar com `Random`. Os 1800 quadros levaram uns 5 s, perto de 6 vezes a velocidade real; com jogo de verdade o número muda com a máquina e com a ROM, então trate como ordem de grandeza e mantenha o `--timeout` folgado. O tempo inclui cerca de 1 s de abertura do emulador.
 
 ### Pular o começo com savestate
 
@@ -92,8 +104,9 @@ PowerShell (Windows):
 ```powershell
 asar.exe hack.asm hack.sfc
 if ($LASTEXITCODE -ne 0) { exit 1 }
-& .\Mesen.exe --testRunner teste.lua hack.sfc --timeout=60 --snes.ramPowerOnState=Random
-exit $LASTEXITCODE
+$teste = Start-Process -FilePath .\Mesen.exe -Wait -PassThru -NoNewWindow `
+  -ArgumentList "--testRunner","teste.lua","hack.sfc","--timeout=60","--snes.ramPowerOnState=Random"
+exit $teste.ExitCode
 ```
 
 bash:
@@ -105,7 +118,9 @@ codigo=$?
 [ "$codigo" -eq 0 ] || { echo "teste falhou ($codigo)"; exit 1; }
 ```
 
-O nome do executável depende do build e do sistema (no Mesen 2 para Windows é `Mesen.exe`); confira no seu. Lembre: -1 do Mesen aparece como 255 no bash.
+O executável do MesenCE é `Mesen.exe` no Windows, `Mesen` no Linux e `Mesen.app/Contents/MacOS/Mesen` no macOS [MesenCE releases]. Lembre: -1 do Mesen aparece como 255 no bash.
+
+No Windows, o Mesen é um aplicativo gráfico (`WinExe`) [MesenCE src], e o PowerShell não espera aplicativo gráfico chamado com `&`: a chamada direta voltou na hora, sem código em `$LASTEXITCODE` [Teste local]. Por isso o exemplo usa `Start-Process -Wait -PassThru`, que espera o fim e dá o código em `.ExitCode`. A chamada com `&` só esperou quando a saída foi encaminhada por um pipe (`& .\Mesen.exe ... | Out-String`), e aí o código veio em `$LASTEXITCODE` [Teste local].
 
 Antes de montar, o build do hack deve conferir o hash da ROM base, como em `snes-rom-hack` (`references/fluxo-git-e-build.md`). A ROM nunca vai pro repositório, o que vale também para o CI: um teste de hack em CI só roda onde a ROM está disponível de forma legítima (máquina própria ou runner privado com a ROM do dono).
 

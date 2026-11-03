@@ -13,6 +13,10 @@ Documentos usados nas skills, com o que cada um cobre e o quanto é confiável. 
 | [Manual do asar](https://github.com/RPGHacker/asar) | RPGHacker e colaboradores | Sintaxe, diretivas e mapeamento do montador | Alta |
 | [Mesen 2 / MesenCE](https://github.com/nesdev-org/MesenCE) | Sour e colaboradores | Debugger, CDL, API Lua e modo de teste, lidos no código | Alta |
 | [bsnes](https://github.com/bsnes-emu/bsnes) | byuu (Near) e colaboradores | Desempate de comportamento de hardware | Apoio |
+| [sd2snes / FXPAK](https://sd2snes.de/blog/compatibility) | ikari_01 (mrehkopf) | Lista oficial de incompatibilidades do flash cart (SPC7110, ST-011, ST-018) | Alta |
+| [QUsb2snes](https://github.com/Skarsnik/QUsb2snes) | Skarsnik | Protocolo usb2snes: leitura e escrita de memória pela USB | Alta |
+| [Super EverDrive X6](https://krikzz.com/our-products/cartridges/super-everdrive-x6.html) | krikzz | Chips suportados pelo flash cart | Alta |
+| [TASVideos SNES Accuracy Tests](https://tasvideos.org/EmulatorResources/SNESAccuracyTests) | comunidade TASVideos | Placar antigo (2014) de testes de precisão por emulador | Média |
 
 ## Por skill
 

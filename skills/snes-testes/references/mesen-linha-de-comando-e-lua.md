@@ -1,6 +1,10 @@
 # Mesen: linha de comando e Lua para teste
 
-Tudo conferido no código do MesenCE (commit 4b8a196, 07/10/2026) e comparado com o Mesen 2 arquivado [MesenCE src][Mesen2 src]. Nada foi executado: é o que o código faz, não o que foi visto rodando.
+Tudo conferido no código do MesenCE (commit 4b8a196, 07/10/2026) e comparado com o Mesen 2 arquivado [MesenCE src][Mesen2 src]. Os pontos marcados com [Teste local] foram conferidos rodando o MesenCE 2.2.1 no Windows 11 com uma ROM própria de 32 KB montada pelo asar; o resto é o que o código faz.
+
+## Executável
+
+O nome é `Mesen` em todos os sistemas: o projeto da interface gera o assembly `Mesen` [MesenCE src], e os pacotes da versão 2.2.1 trazem `Mesen.exe` no Windows, `Mesen` no Linux e `Mesen.app/Contents/MacOS/Mesen` no macOS, cada um num zip de um arquivo só [MesenCE releases]. No Windows o arquivo diz versão 2.2.1, produto "Mesen" [Teste local].
 
 ## Opções de linha de comando
 
@@ -27,7 +31,14 @@ Qualquer propriedade da configuração pode ser passada como `--caminho.propried
 | `--snes.enableRandomPowerOnState=` | `true`, `false` | Aleatoriza também outros estados de power on |
 | `--snes.enableStrictBoardMappings=` | `true`, `false` | Mapeamento de placa mais estrito |
 
-A opção `--debug.scriptWindow.allowIoOsAccess=true` deveria liberar `io` e `os` para o script, pela forma como a configuração é aplicada no código, mas **não foi confirmada** em execução.
+### Liberar `io` e `os`: `--debug.scriptWindow.allowIoOsAccess=true`
+
+O nome bate com a configuração `ScriptWindow.AllowIoOsAccess` da interface, que vira `ScriptAllowIoOsAccess` no núcleo [MesenCE src]. Com ela ligada, o núcleo carrega `io`, `os` e `package`, permite carregar arquivo e acrescenta a pasta do script ao `package.path` (para `require`) [MesenCE src]. Conferido [Teste local]:
+
+- Sem a opção, `io`, `os` e `package` são `nil`. Com ela, as três são tabelas e `io.open` grava arquivo.
+- Caminho relativo **não** é relativo à pasta de onde você rodou: o Mesen troca a pasta atual para a pasta home dele na inicialização [MesenCE src], e o arquivo de teste foi parar em `Documentos\MesenCE\`. Use caminho absoluto ou `emu.getScriptDataFolder()`, que só devolve pasta (`LuaScriptData\<nome do script>` dentro da home) quando o acesso está liberado [MesenCE src].
+- No `--testRunner` a opção vale só naquela execução: a rodada seguinte sem ela voltou com `io` em `nil`, porque o test runner não grava configuração [MesenCE src].
+- Acesso à rede (LuaSocket) é outra opção, `AllowNetworkAccess`, e só vale junto com esta [MesenCE src].
 
 ## O `--testRunner` passo a passo
 
@@ -40,11 +51,11 @@ Pelo código de `TestRunner.cs` [MesenCE src]:
 5. Liga a velocidade máxima e solta a emulação.
 6. A cada 100 ms confere se a emulação parou. Parou: o código de saída é o valor passado para `emu.stop`. Passou do timeout: -1.
 
-O valor volta como código de saída do processo. No PowerShell, `-1` aparece como `-1` em `$LASTEXITCODE`; no bash, um código negativo aparece como 255 (o shell só guarda 8 bits). Esse detalhe dos shells é comportamento geral do sistema, não do Mesen.
+O valor volta como código de saída do processo. Conferido [Teste local]: `emu.stop(7)` saiu com 7, e um script que nunca chama `emu.stop` saiu com -1 depois do `--timeout`. No PowerShell, `-1` aparece como `-1` no `.ExitCode` do `Start-Process -Wait -PassThru` [Teste local] (a chamada direta com `&` não espera o Mesen: ver a receita); no bash, um código negativo aparece como 255 (o shell só guarda 8 bits). Esse detalhe dos shells é comportamento geral do sistema, não do Mesen.
 
 ### `emu.stop` contra `emu.exit`
 
-O texto de ajuda diz "use emu.exit(...) to stop execution", mas a API Lua só tem `emu.stop(exitCode)`, descrita como a função que para a emulação e devolve o código usado pelo `--testRunner` [MesenCE src]. É a divergência mais importante desta skill: escreva `emu.stop`.
+O texto de ajuda diz "use emu.exit(...) to stop execution", mas a API Lua só tem `emu.stop(exitCode)`, descrita como a função que para a emulação e devolve o código usado pelo `--testRunner` [MesenCE src]. É a divergência mais importante desta skill: escreva `emu.stop`. Na prática [Teste local], um script com `emu.exit(5)` imprimiu o que vinha antes, parou com erro na chamada e o processo terminou em -1 por timeout, não em 5.
 
 Outros dois detalhes do código [MesenCE src]:
 
@@ -87,14 +98,35 @@ Em `snesWorkRam`, o endereço é o offset dentro da WRAM: `0x0100` é o byte em 
 
 - `emu.createSavestate()` devolve uma string binária; `emu.loadSavestate(s)` carrega. **Só dentro de callback `exec` da CPU principal.**
 - `emu.takeScreenshot()` devolve um PNG como string; não grava arquivo.
-- `emu.getState()` devolve uma tabela com chaves como `frameCount` e `masterClock`; os nomes podem mudar entre versões.
+- `emu.getState()`: ver a seção abaixo.
 - `emu.getRomInfo()` devolve nome, caminho e SHA-1 do arquivo: útil para o teste recusar ROM errada.
 - `emu.reset()` só funciona dentro de callback.
 - `emu.addCheat`, `emu.clearCheats`, `emu.getAccessCounters`, `emu.getCdlData` também existem.
 - O MesenCE acrescenta `getCpuState`, `setCpuState`, `getCpuCycleCount`, `getMasterClock`, `drawPixels` e `getPressedKeys`.
 
+### O que o `emu.getState()` devolve no SNES
+
+O núcleo serializa o console inteiro num mapa e acrescenta alguns valores próprios do Lua [MesenCE src]. O resultado é uma tabela **plana**, com o caminho no nome da chave: `s["cpu.a"]` funciona, `s.cpu` é `nil`. Na 2.2.1 com uma ROM LoROM simples vieram 602 chaves [Teste local]:
+
+| Grupo | Exemplos de chave |
+|---|---|
+| Valores do Lua | `frameCount`, `masterClock`, `clockRate` (21477270 em NTSC), `consoleType` (`Snes`), `region` (`Ntsc`) |
+| `cpu.` | `cpu.a`, `cpu.x`, `cpu.y`, `cpu.sp`, `cpu.d`, `cpu.dbr`, `cpu.k`, `cpu.pc`, `cpu.ps`, `cpu.emulationMode`, `cpu.cycleCount` |
+| `ppu.` | `ppu.bgMode`, `ppu.forcedBlank`, `ppu.screenBrightness`, `ppu.scanline`, `ppu.frameCount`, `ppu.vramAddress`, `ppu.layers[0].hscroll`, `ppu.mode7.matrix[0]`, `ppu.window[0].left` |
+| `spc.` | `spc.a`, `spc.x`, `spc.y`, `spc.pc`, `spc.sp`, `spc.ps`, `spc.timer0.target`, `spc.dsp.voices[0].envVolume` |
+| `dmaController.` | `dmaController.channel[0].srcAddress`, `...transferSize`, `...hdmaTableAddress`, `dmaController.hdmaChannels` |
+| `internalRegisters.` | `internalRegisters.enableNmi`, `...hCounter`, `...vCounter`, `...controllerData[0]`, `...aluMulDiv.multOperand1` |
+| `memoryManager.`, `controlManager.` | `memoryManager.cpuSpeed`, `memoryManager.registerHandlerB.wramPosition`, `controlManager.pollCounter` |
+
+Detalhes que pegam:
+
+- Os valores são números ou booleanos, não texto em hexa: `cpu.pc=32768` é `$8000`.
+- O `frameCount` começa em 0: no décimo callback `endFrame` ele valia 9 [Teste local].
+- Só ROM sem chip de cartucho foi testada; se um jogo com SA-1 ou SuperFX acrescenta chaves, não foi conferido.
+- O código atual do MesenCE, posterior à 2.2.1, acrescenta `fps` aos valores do Lua [MesenCE src]; na 2.2.1 essa chave não existe [Teste local]. É o exemplo concreto de que o conjunto muda entre versões: para o teste decidir, continue preferindo `emu.read` num endereço combinado.
+
 ## Sandbox do script
 
-- Sem acesso liberado (padrão), as bibliotecas `io`, `os` e `package` não são carregadas [MesenCE src].
+- Sem acesso liberado (padrão), as bibliotecas `io`, `os` e `package` não são carregadas [MesenCE src][Teste local]. Como liberar: seção "Liberar `io` e `os`" acima.
 - Cada execução tem limite de tempo, `ScriptTimeout`, padrão 1 segundo [MesenCE src].
-- `print` é o do Lua (saída padrão do processo). `emu.log` vai para a janela de log do script (500 linhas). `emu.displayMessage` vai para as mensagens do emulador, que `--enableStdout` manda para a saída padrão [MesenCE src].
+- `print` é o do Lua (saída padrão do processo). No Windows, rodando o `--testRunner` pelo PowerShell, a saída aparece no terminal e também pode ser redirecionada para arquivo (`Start-Process ... -RedirectStandardOutput saida.txt`, ou `>` no `cmd`) [Teste local]. `emu.log` vai para a janela de log do script (500 linhas). `emu.displayMessage` vai para as mensagens do emulador, que `--enableStdout` manda para a saída padrão [MesenCE src].
