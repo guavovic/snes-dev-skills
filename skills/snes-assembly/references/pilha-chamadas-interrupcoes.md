@@ -1,6 +1,6 @@
 # Pilha, chamadas, interrupções e MVN/MVP
 
-Fontes: [WDC] seções 3, 5, 7, [Clark] seções 6.2, 6.3, 6.6, [fullsnes], desempate com [Mesen2].
+Fontes: [WDC] seções 3, 5, 7, [Clark] seções 6.2, 6.3, 6.6, [fullsnes], [E&L], [6502.org int], desempate com [Mesen2] e [bsnes].
 
 ## Pilha
 
@@ -43,7 +43,7 @@ Truque comum pra chamar uma rotina que termina em RTS (de outro banco, com JSL):
 
 Sequência [WDC 7.11, 7.12][Clark 6.3.1.1][Mesen2 `ProcessInterrupt`]:
 
-1. Termina a instrução atual (MVN/MVP pode ser interrompida entre bytes e retoma depois).
+1. Termina a instrução atual. MVN/MVP é a exceção: termina o byte em andamento e empilha o endereço do próprio MVN/MVP, então o RTI volta pra ela e a cópia continua com os X, Y e C atualizados [E&L][Mesen2].
 2. Empilha PB, PC e P (4 bytes). No modo emulação empilha só PC e P (3 bytes).
 3. Liga I, zera D, faz PB=$00. DB **não muda** (nenhuma das fontes altera DB; o [Mesen2] confirma).
 4. Lê o vetor de 16 bits no banco 0 e pula pra 00:vetor.
@@ -54,7 +54,14 @@ M e X **não** são alterados pela interrupção, mas P é empilhado e o RTI res
 
 `RTI` tem que rodar no mesmo modo (nativo ou emulação) em que a interrupção aconteceu, senão puxa o número errado de bytes [Clark 6.3.2].
 
-BRK e COP são instruções de 1 byte seguidas de um byte de assinatura; o endereço empilhado é o do opcode + 2 [WDC 7.15][Clark 6.3.1]. Prioridade de entrada: RESET > ABORT > NMI > IRQ [WDC 7.19].
+BRK e COP são instruções de 1 byte seguidas de um byte de assinatura; o endereço empilhado é o do opcode + 2 [WDC 7.15][Clark 6.3.1]. No asar 1.91, `BRK` e `COP` sem operando já montam com assinatura $00 (`00 00`, `02 00`). Prioridade de entrada: RESET > ABORT > NMI > IRQ [WDC 7.19]; no SNES, se NMI e IRQ chegam juntos, o NMI entra primeiro [bsnes][Anomie timing].
+
+### Latência e WAI
+
+- A entrada na interrupção, no modo nativo, leva 8 ciclos de CPU. Somando a instrução que estava rodando, a resposta pode chegar a 16 ciclos depois do pedido [6502.org int].
+- A CPU testa a interrupção um ciclo antes do fim da instrução; um pedido que chega no último ciclo só entra depois da instrução seguinte [bsnes `lastCycle`][Anomie timing].
+- A CPU só salva PB, PC e P e só muda I e D (e PB); A, X, Y, DB e D (registrador) ficam por conta do tratador [6502.org int][WDC 7.12].
+- `WAI` para a CPU até chegar uma interrupção. Com I=0 ela entra no tratador. Com `SEI` antes do `WAI`, um IRQ acorda a CPU e ela segue na instrução depois do `WAI`, sem empilhar nem ler o vetor, o que dá a resposta mais rápida possível [6502.org int][bsnes `irqTest`]. No SNES, sair do `WAI` leva 12 clocks mestre [Anomie timing].
 
 ### Vetores (banco 0)
 
@@ -83,7 +90,8 @@ No modo emulação BRK e IRQ dividem o vetor: o tratador diferencia pelo bit 4 (
 - No fim, **DB = banco de destino**. Salve com PHB/PLB [WDC 7.18][Clark][Mesen2].
 - Com X=1 (índices de 8 bits) os endereços ficam presos em $00xx. Use `REP #$10` antes.
 - Bytes de máquina: `opcode, banco destino, banco origem` [WDC][Clark].
-- Sintaxe: padrão WDC e ca65 escrevem `MVN origem,destino`; **o asar escreve `MVN destino,origem`** (grava os operandos na ordem de máquina, conferido no `arch-65816.cpp`, e o manual anota "destination, source") [asar][ca65][WDC 6]. Sintaxe do WLA-DX: não confirmado.
+- Sintaxe: padrão WDC, ca65 e WLA-DX escrevem `MVN origem,destino`; **o asar escreve `MVN destino,origem`** (grava os operandos na ordem de máquina, conferido no `arch-65816.cpp`, e o manual anota "destination, source") [asar][ca65][WDC 6][WLA-DX código]. O [E&L] explica a origem da confusão: no padrão o programador escreve origem e destino e o montador grava ao contrário.
+- MVN interrompido não perde a cópia: ver o passo 1 da sequência de interrupção.
 
 Exemplo asar, copiando 256 bytes de $7F0000 para $7E2000:
 
@@ -96,3 +104,5 @@ Exemplo asar, copiando 256 bytes de $7F0000 para $7E2000:
     MVN $7E,$7F       ; asar: destino, origem
     PLB
 ```
+
+Testado em 02/11/2026: montado no asar 1.91 e rodado no Mesen 2 (`--testRunner`) depois do boot da skill, numa ROM vazia própria. Os 256 bytes chegaram em $7E2000, o DB ficou $7E logo depois do MVN e o `PLB` devolveu DB=$00.

@@ -1,6 +1,6 @@
 # Desempenho no SNES
 
-Fontes: [fullsnes] "SNES Memory Speed" e "SNES Memory Control", [WDC], [Clark], tabela de [instruções](instrucoes.md).
+Fontes: [fullsnes] "SNES Memory Speed" e "SNES Memory Control", [WDC], [Clark], tabela de [instruções](instrucoes.md), [bsnes], [Anomie timing], [SNESdev timing].
 
 ## Ciclo de CPU não é tempo fixo
 
@@ -19,6 +19,19 @@ O clock mestre do SNES NTSC é 21,47727 MHz. Cada ciclo de CPU dura 6, 8 ou 12 c
 | Ciclo interno (sem acesso à memória) | 6 | 3,58 MHz |
 
 FastROM: escrever 1 no bit 0 de `$420D` (MEMSEL) faz a ROM nos bancos $80-$FF responder em 6 clks; no reset vale 0 [fullsnes]. Só ajuda se o código e os dados forem acessados pelos bancos $80+ (rodar em $80:8000 e não em $00:8000). A ROM precisa ser rápida (120 ns) e o cabeçalho deve indicar isso.
+
+## Refresh da DRAM e tempo útil por linha
+
+Uma linha de vídeo tem 1364 clocks mestre. Em toda linha a CPU para 40 clocks mestre pro refresh da WRAM, então sobram 1324 clocks pra executar código [SNESdev timing][Anomie timing][bsnes]. Isso é cerca de 3% do tempo, e conta em qualquer cálculo de "quantos ciclos cabem no V-Blank".
+
+Posição do refresh na linha: o [bsnes] faz em 530 clocks na CPU revisão 1 e em 538 na revisão 2. O [Anomie timing] dá cerca de 536, com o primeiro em 538, e marca isso como teoria. A pausa de 40 clocks bate nas três fontes; a posição exata depende da revisão do chip.
+
+## Quando o NMI e o IRQ disparam
+
+- **NMI**: no começo do V-Blank, perto do ponto H=0,5 da primeira linha de V-Blank [Anomie timing]; o [bsnes] liga o NMI quando a linha chega a `vdisp` (225, ou 240 com overscan).
+- **H-IRQ**: pedido pra `HTIME` (registradores $4207/$4208) dispara cerca de 3,5 pontos depois do ponto `HTIME`; a flag sobe em 14 + 4 x `HTIME` clocks mestre na linha [Anomie timing][bsnes]. O [bsnes] não dispara no último ponto do campo.
+- Logo depois de escrever em $4200 e logo depois de um DMA, o teste de interrupção fica adiado um pouco (`irqLock` no [bsnes]), então um IRQ que cairia exatamente ali entra atrasado.
+- Pra efeito de linha a linha, prefira HDMA. IRQ tem uma variação natural de alguns ciclos de CPU, porque espera a instrução em andamento terminar (ver [latência](pilha-chamadas-interrupcoes.md#latência-e-wai)).
 
 ## Dicas de ciclo
 

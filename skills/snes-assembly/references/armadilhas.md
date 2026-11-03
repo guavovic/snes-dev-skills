@@ -9,12 +9,12 @@ Os erros que mais quebram código de 65816, principalmente em ROM hack. Cada ite
 **Conserto**:
 - Descubra o estado de M/X no ponto do hook (debugger do Mesen ou bsnes, ou lendo o código original até o último REP/SEP/PLP).
 - Entre com `PHP` e saia com `PLP`: restaura M, X e as outras flags.
-- Escreva imediatos com tamanho explícito no asar (`LDA.b #$10`, `LDX.w #$0100`). O asar avisa imediato sem tamanho com `-wWimplicitly_sized_immediate` [asar].
+- Escreva imediatos com tamanho explícito no asar (`LDA.b #$10`, `LDX.w #$0100`). A opção `-wWimplicitly_sized_immediate` faz o asar avisar só quando o tamanho não sai do texto: literal decimal (`LDA #128`), expressão (`LDA #$0080+0`) ou label (`LDA #alvo`). Hex com quantidade de dígitos (`#$80`, `#$0080`) já conta como tamanho escolhido e não gera aviso, mesmo que seja o tamanho errado pro estado de M [asar], testado no asar 1.91.
 - Atenção: `PLP` também restaura C, Z, N. Se o código original testa uma flag logo depois do hook, devolva a flag certa em vez de restaurar tudo.
 
 ```asm
 org $008123            ; endereço do hook (exemplo)
-    JSL MeuCodigo      ; 4 bytes; complete com NOP se a instrução substituída for maior
+    autoclean JSL MeuCodigo  ; 4 bytes; complete com NOP se a instrução substituída for maior
 
 freecode
 MeuCodigo:
@@ -27,6 +27,8 @@ MeuCodigo:
     ; refaça aqui as instruções originais que o JSL sobrescreveu
     RTL
 ```
+
+Este exemplo foi montado no asar 1.91 sobre uma ROM LoROM vazia de 1 MB. Sem o `autoclean`, o asar avisa `Wfreespace_leaked`: aplicar o patch de novo ocuparia outro bloco e deixaria o antigo perdido. Com o `autoclean`, aplicar duas vezes dá a mesma ROM. No mesmo teste, o `freecode` numa ROM de 128 KB falhou com "No freespace found": o asar não procurou espaço livre nos primeiros bancos, então expanda a ROM antes de usar `freecode` [asar].
 
 ## 2. A de 16 bits com B escondido
 
@@ -63,7 +65,9 @@ O NMI/IRQ pode entrar no meio de qualquer código. O tratador tem que salvar A, 
 
 ## 8. Ordem dos operandos de MVN/MVP
 
-WDC e ca65: `MVN origem,destino`. **asar: `MVN destino,origem`** [asar manual + `arch-65816.cpp`]. Copiar código entre montadores sem inverter troca origem e destino em silêncio. Os bytes de máquina são sempre `54 destino origem`.
+WDC, ca65 e WLA-DX: `MVN origem,destino`. **asar: `MVN destino,origem`** [asar manual + `arch-65816.cpp`]. Copiar código entre montadores sem inverter troca origem e destino em silêncio. Os bytes de máquina são sempre `54 destino origem` [WDC][E&L].
+
+Conferido montando: no asar 1.91, `MVN $34,$12` gera `54 34 12`; no WLA-DX, o teste `all_instructions_test` do repositório espera `mvn $12,$34` = `54 34 12` [WLA-DX código]. O asar também aceita um operando só de 16 bits, no formato `$SSDD` (byte alto = origem): `MVN $7E7F` gera `54 7F 7E`, ou seja, origem $7E e destino $7F, ao contrário da forma com vírgula. Evite essa forma.
 
 ## 9. Page wrap do modo emulação
 
@@ -76,15 +80,17 @@ Só aparece no boot ou em código que volta pro modo emulação: com DL=$00, ins
 | CPU | `arch 65816` | `.p816` / `--cpu 65816` | `wla-65816` |
 | Tamanho do imediato | sufixo no opcode: `LDA.b #1`, `LDA.w #1`; sem sufixo, pelo número de dígitos hex | diretivas `.a8/.a16/.i8/.i16`, ou `.smart` (segue REP/SEP) | sufixo no operando `LDA #1.w`, `.ACCU 8/16`, `.INDEX 8/16`; acompanha REP/SEP sozinho |
 | Forçar direct/abs/long | `LDA.b`, `LDA.w`, `LDA.l` | prefixo `z:`, `a:`, `f:` | `label.b`, `label.w`, `label.l` |
-| Pulo long | `JML`, `JSL` (`JMP` long só no modo xkas, obsoleto) | `jml`, `jsl` (`jmp`/`jsr` long só com `long_jsr_jmp_rts`) | não confirmado |
-| MVN/MVP | `MVN dst,src` | `mvn src,dst` ou `mvn #^src,#^dst` | não confirmado |
-| `BRK` sem operando | 2 bytes (`00 00`) | 1 byte | não confirmado |
-| Apelidos | não aceita `SWA`, `TAD` etc. | aceita `CPA DEA INA SWA TAD TAS TDA TSA` | não confirmado |
+| Pulo long | `JML`, `JSL`, `JML.l` (`JMP $C08000` e `JSR.l` dão erro no 1.91) | `jml`, `jsl` (`jmp`/`jsr` long só com `long_jsr_jmp_rts`) | `JML`, `JSL`, ou `JMP`/`JSR` com operando de 24 bits, com `>` ou com `.l` |
+| MVN/MVP | `MVN dst,src` | `mvn src,dst` ou `mvn #^src,#^dst` | `mvn src,dst` |
+| `BRK` sem operando | 2 bytes (`00 00`); `COP` sem operando = `02 00` | 1 byte | 2 bytes (`00 00`); `BRK $01` = `00 01` |
+| Apelidos | nenhum (`BLT BGE CPA DEA INA SWA TAD TAS TDA TSA` dão erro); `INC`/`DEC` sem operando = `$1A`/`$3A` | aceita `CPA DEA INA SWA TAD TAS TDA TSA` | aceita `DEA INA SWA TAD TAS TDA TSA`; não tem `BLT`, `BGE` nem `CPA` |
 | Endereço do código | `org $008000` (endereço SNES; o mapeamento vem de `lorom`/`hirom`) | segmentos + arquivo de config do linker | `.BANK`/`.ORG`/`.SECTION` com `.MEMORYMAP` |
 | Patch sobre ROM existente | nativo: `org`, `freecode`, `autoclean`, `pushpc/pullpc` | não é o foco | não é o foco |
 
-Fontes: [asar] manual e `arch-65816.cpp`; [ca65] seções 65816, `.SMART`, `.A8/.A16`, prefixos de endereço; [WLA-DX] `asmsyntax.rst` e `asmdiv.rst`.
+Fontes: [asar] manual e `arch-65816.cpp`, coluna conferida montando no asar 1.91; [ca65] seções 65816, `.SMART`, `.A8/.A16`, prefixos de endereço; [WLA-DX] `asmsyntax.rst` e `asmdiv.rst`; [WLA-DX código] tabela de instruções `i65816.c` e testes `tests/65816` (lidos, não executados). Os apelidos `DEA INA SWA TAD TAS TDA TSA` vêm da tabela de apelidos de [E&L], que também lista `BLT`/`BGE` e `JMP` long como sinônimos de `BCC`/`BCS` e `JML`.
 
 Avisos do [ca65] que valem pra qualquer montador: `.smart` acompanha REP/SEP pela ordem do texto, não pelo fluxo de execução; depois de um desvio ou de uma sub-rotina o montador pode estar errado sobre M/X. Na dúvida, declare o tamanho.
 
-Ainda sem confirmação neste repositório: o mnemônico de pulo long, a sintaxe de MVN e o tamanho de `BRK` no WLA-DX; o exemplo de bytes da doc do WLA-DX para `.ACCU 16` aparece em ordem big-endian e parece erro de digitação da documentação.
+Erro da documentação do WLA-DX: o exemplo de `.ACCU 16` em `asmdiv.rst` mostra `AND #6` como `$29 $00 $06`, mas o código (`phase_4.c`) grava o imediato de 16 bits em little-endian, o que dá `$29 $06 $00` [WLA-DX código].
+
+Ainda sem confirmação: `COP` sem operando no WLA-DX. A tabela `i65816.c` guarda o valor $0200, que gravado em little-endian sairia `00 02` (opcode errado); o WLA-DX não foi executado aqui. Escreva sempre `COP $xx` com assinatura.

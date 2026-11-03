@@ -3,6 +3,7 @@
 ## [Não lançado]
 
 - **snes-testes**: Mesen rodado de verdade (print no terminal, `allowIoOsAccess`, chaves do `emu.getState()`, executável por sistema, receita conferida e exemplo de PowerShell corrigido para esperar o processo); FXPAK, usb2snes, Super EverDrive e snes9x com fonte oficial ou comparação registrada.
+- **snes-assembly**: sintaxe do WLA-DX conferida no código, temporização de refresh, NMI e IRQ pelo bsnes, Eyes e Lichty e 6502.org como fontes, e todos os exemplos montados no asar 1.91 (hook agora com `autoclean`).
 
 ## v0.1
 

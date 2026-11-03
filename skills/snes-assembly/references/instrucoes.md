@@ -1,6 +1,6 @@
 # Tabela de instruções (256 opcodes)
 
-Gerada a partir da tabela do [Clark] e conferida opcode por opcode contra o [SFC wiki] (ciclos base + notas de rodapé) com um script que testou todas as combinações de m, x, e, w, p e t. As 256 linhas batem, com três exceções resolvidas abaixo. Sintaxe convertida pro [asar] conforme a lista de opcodes do manual e o `arch-65816.cpp`.
+Gerada a partir da tabela do [Clark] e conferida opcode por opcode contra o [SFC wiki] (ciclos base + notas de rodapé) com um script que testou todas as combinações de m, x, e, w, p e t. As 256 linhas batem, com três exceções resolvidas abaixo. Sintaxe convertida pro [asar] conforme a lista de opcodes do manual e o `arch-65816.cpp`. Em 02/11/2026 a coluna "Sintaxe asar" inteira foi montada no asar 1.91: as 256 linhas montam e o opcode e a quantidade de bytes de cada uma batem com a tabela (imediatos com tamanho escolhido pelos dígitos hex).
 
 ## Como ler
 
