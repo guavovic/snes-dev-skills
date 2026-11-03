@@ -1,6 +1,8 @@
 # Mudanças
 
-## [Não lançado]
+## v0.2
+
+Revisão das sete skills: todos os exemplos em asar foram montados no asar 1.91 e rodados no Mesen 2.2.1 com ROM própria, as pendências da v0.1 foram conferidas no código dos emuladores e em fonte oficial, e o que não fechou foi para issues com o marco v0.3.
 
 - **snes-testes**: Mesen rodado de verdade (print no terminal, `allowIoOsAccess`, chaves do `emu.getState()`, executável por sistema, receita conferida e exemplo de PowerShell corrigido para esperar o processo); FXPAK, usb2snes, Super EverDrive e snes9x com fonte oficial ou comparação registrada.
 - **snes-assembly**: sintaxe do WLA-DX conferida no código, temporização de refresh, NMI e IRQ pelo bsnes, Eyes e Lichty e 6502.org como fontes, e todos os exemplos montados no asar 1.91 (hook agora com `autoclean`).
