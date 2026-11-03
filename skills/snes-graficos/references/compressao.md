@@ -79,22 +79,34 @@ A posição é absoluta no anel, não distância pra trás. A versão mais nova 
 
 ### Variantes em jogos de SNES
 
-O [sfc-comp] reimplementa dezenas de compressores de SNES e expõe os parâmetros de cada um na chamada do LZSS. Alguns, pra mostrar o quanto variam (nomes de função do sfc-comp):
+O [sfc-comp] reimplementa dezenas de compressores de SNES e expõe os parâmetros de cada um na chamada do LZSS. Alguns, pra mostrar o quanto variam (nomes de função do sfc-comp, lidos no código do commit `dd9dc03`). "Flags do bit 0" quer dizer 1 byte por 8 itens lido a partir do bit 0, como no LZSS.C; referência sempre em 2 bytes little endian, salvo onde dito:
 
-| Função | Janela | Tamanho | Diferença em relação ao LZSS.C |
-|---|---|---|---|
-| `action_pachio` | 4096 | 3 a 18 | nenhuma: anel com `0x20` e mesmo empacotamento |
-| `dq12` | 4096 | 3 a 18 | anel começa zerado |
-| `hanjuku_hero` | 4096 | 3 a 18 | anel começa com um padrão próprio, não constante |
-| `marios_super_picross` | 4096 | 3 a 18 | empacota `(posição << 4) \| (tamanho - 3)` |
-| `bokujou_monogatari` (LC_LZ11) e `ff5` | 2048 | 3 a 34 | 5 bits de tamanho e 11 de posição |
-| `ff6` | 2048 | 3 a 34 | empacota `posição \| (tamanho - 3) << 11` |
-| `wizardry6`, `dq6` | 1024 | 3 a 66 | 6 bits de tamanho |
-| `super_mario_rpg`, `rs3` | | | distância relativa em vez de posição absoluta, cabeçalho maior |
-| `dragon_knight_4` | | | flags lidas a partir do bit 7, e bit 1 = referência |
-| `kiki_kaikai` | | | flags de 16 bits |
+| Função | Janela | Tamanho | Diferença em relação ao LZSS.C | Segunda fonte |
+|---|---|---|---|---|
+| `action_pachio` | 4096 | 3 a 18 | nenhuma no empacotamento: anel com `0x20`, primeira escrita em `0xFEE`; cabeçalho de 4 bytes (tamanho descomprimido e comprimido) | uma fonte só |
+| `dq12` | 4096 | 3 a 18 | anel começa zerado; tamanho descomprimido em 2 bytes big endian no cabeçalho | uma fonte só |
+| `hanjuku_hero` | 4096 | 3 a 18 | anel começa com um padrão próprio, não constante (cada byte 13 vezes, 0 a 255, o inverso, zeros e espaços); cabeçalho de 8 bytes | uma fonte só |
+| `marios_super_picross` | 4096 | 3 a 18 | empacota `(posição << 4) \| (tamanho - 3)`; anel zerado | uma fonte só |
+| `bokujou_monogatari` (LC_LZ11) e `ff5` | 2048 | 3 a 34 | 5 bits de tamanho e 11 de posição: byte 1 = posição bits 0-7, byte 2 = tamanho - 3 nos bits 0-4 e posição bits 8-10 nos bits 5-7; anel zerado, primeira escrita em `0x7DE`; cabeçalho = tamanho descomprimido | LC_LZ11: [HM-Decomp] (seção abaixo); `ff5`: [ff6tools], conferido rodando (abaixo) |
+| `ff6` | 2048 | 3 a 34 | empacota `posição \| (tamanho - 3) << 11`; anel zerado, primeira escrita em `0x7DE`; cabeçalho = tamanho **comprimido** (2 bytes, contando o próprio cabeçalho) | [ff6tools], conferido rodando (abaixo) |
+| `wizardry6` | 2048 | 3 a 34 | flags do bit 0 com sentido invertido (bit 0 = literal, bit 1 = referência); empacota `posição \| (tamanho - 3) << 11`, posição contada a partir do começo da janela de 2048 bytes que acaba no byte atual | uma fonte só |
+| `dq6` | 1024 | 3 a 66 | 6 bits de tamanho e 10 de posição (byte 2 = tamanho - 3 nos bits 0-5, posição bits 8-9 nos bits 6-7); primeira escrita em `0x3BE`; sem cabeçalho | uma fonte só |
+| `super_mario_rpg` (LC_LZ8) | 4095 | 3 a 18 | distância pra trás em vez de posição absoluta; cabeçalho de 8 bytes big endian (tamanho descomprimido e comprimido) | nome e uso confirmados no `LunarDLL.h` ("gráficos dos créditos"); parâmetros, uma fonte só (ver abaixo) |
+| `rs3_comp_1` | 4095 | 3 a 18 | mesma distância pra trás do `super_mario_rpg`, com cabeçalho de 2 bytes (tamanho comprimido) | uma fonte só |
+| `dragon_knight_4` | 2048 | 2 a 33 | flags lidas a partir do bit 7, e bit 1 = referência; referência com 5 bits de tamanho, posição relativa ao fim da janela | uma fonte só |
+| `kiki_kaikai` | 2048 | 3 a 34 | flags de 16 bits, bit 1 = referência; empacota `(distância - 1) \| (tamanho - 3) << 11` | uma fonte só |
 
-Conclusão: não existe um LZSS "padrão do SNES". Os pontos que mudam são janela, valor inicial do anel, posição da primeira escrita, sentido e ordem dos bits de flag, divisão dos bits entre posição e tamanho, e se a posição é absoluta ou relativa. Essa tabela tem uma fonte só (o sfc-comp); pra um jogo específico, confirme na rotina ou numa segunda implementação.
+Conclusão: não existe um LZSS "padrão do SNES". Os pontos que mudam são janela, valor inicial do anel, posição da primeira escrita, sentido e ordem dos bits de flag, divisão dos bits entre posição e tamanho, se a posição é absoluta ou relativa e o que o cabeçalho guarda. O próprio Okumura já previa a troca do preenchimento: no texto de 1988 que publicou o LZSS, ele diz que os primeiros `N - F` bytes foram preenchidos com espaço, mas que dá pra pôr ali as palavras reservadas da linguagem que a pessoa mais usa [Okumura 1988]. Anel com padrão próprio, como o do `hanjuku_hero`, é essa mesma ideia.
+
+Linha marcada "uma fonte só": foi procurada implementação ou documentação aberta independente (repositórios de ferramenta e tradução no GitHub, catálogo do [Lunar Compress], Data Crystal pelas cópias do Internet Archive, porque o site recusa acesso direto) e nada foi achado; pra um jogo específico, confirme na rotina antes de recomprimir.
+
+### Conferência rodando: ff5 e ff6
+
+O [ff6tools] (editor aberto de Final Fantasy, GPL-3.0) tem compressor e descompressor próprios pros dois formatos (`ff5-lzss` e `ff6-lzss` em `rom/romtools.js`), num projeto separado do sfc-comp. Em 03/11/2026 o compressor do ff6tools foi rodado no Node sobre seis arquivos sintéticos gerados por script nosso (1 a 9000 bytes, com repetições e um bloco só de zeros) e a saída foi descomprimida com um descompressor em Python escrito a partir dos parâmetros do sfc-comp acima: os seis voltaram iguais nos dois formatos, e trocar um descompressor pelo outro falha, ou seja, o teste distingue os dois. Nenhum dado de jogo foi usado [Teste local: LZSS].
+
+As duas fontes concordam em tudo o que a tabela diz pra `ff5` e `ff6`, inclusive a diferença do cabeçalho (tamanho descomprimido no ff5, comprimido no ff6).
+
+O mesmo teste com o `recomp.exe` do [Lunar Compress] (LC_LZ8 pro `super_mario_rpg`) não rodou: a execução do binário baixado foi barrada no ambiente do agente. Fica **não confirmado** até alguém rodar `recomp.exe amostra.bin saida.bin 0 1007 0` e descomprimir com o formato da tabela.
 
 ## LC_LZ11 (LZSS de janela de 2 KB)
 

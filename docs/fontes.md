@@ -31,6 +31,8 @@ Documentos usados nas skills, com o que cada um cobre e o quanto é confiável. 
 | [z3randomizer](https://github.com/KatDevsGames/z3randomizer) | KatDevsGames e colaboradores | Organização de um hack grande aberto em asar (só a estrutura) | Média |
 | [Lunar Compress](https://fusoya.eludevisibility.org/lc/index.html) | FuSoYa | Catálogo de formatos de compressão e os números da DLL, conferidos no pacote oficial v2.00 | Alta |
 | [sfc-comp](https://github.com/sfc-comp/sfc-comp) | sfc-comp (MIT) | Compressores de jogos de SNES reimplementados: LC_LZ11 e variantes de LZSS | Média/alta |
+| [ff6tools](https://github.com/everything8215/ff6tools) | everything8215 (GPL-3.0) | Compressor e descompressor do LZSS do FF5 e do FF6, segunda fonte desses formatos, rodado com dados sintéticos | Média/alta |
+| [Okumura 1988](https://web.archive.org/web/2005/http://oku.edu.mie-u.ac.jp:80/~okumura/compression/1988.html) | Haruhiko Okumura | Página do autor, em japonês, sobre a publicação do LZSS em 1988 e o preenchimento inicial do anel | Alta |
 | [YY-CHR @wiki](https://w.atwiki.jp/yychr/) | YY | Página oficial do YY-CHR, em japonês: versão e formatos | Alta |
 | [Entrevistas de 2017 da Nintendo JP](https://web.archive.org/web/20191213044242/https://topics.nintendo.co.jp/c/article/0e9c42d3-7d8a-11e7-8cda-063b7ac45a6d.html) | Nintendo | Relato em japonês das equipes de F-ZERO e Super Mario Kart sobre o Mode 7, lido em cópia do Internet Archive | Alta pro relato |
 | [SNES CPU usage meter](https://nesdev.nes.science/f12/t12419.xhtml) | fórum NESdev, 2015 | Medir o tempo do quadro pela cor de fundo ou pela linha atual | Média |

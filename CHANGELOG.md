@@ -4,6 +4,7 @@
 
 - **snes-tecnicas**: paleta de hora do dia e estação com caso documentado (Harvest Moon, pela desmontagem e pelo guia da reimplementação em C) e exemplo novo em asar, testado no Mesen, que leva a paleta até a alvo um passo por canal, em fatias por quadro.
 - **snes-assembly**, **snes-rom-hack**, **snes-tecnicas**, **snes-testes**: conta sem precedência do asar 1.x documentada como armadilha (`asar 1.90` com dois dígitos, define, divisão) e conferida em todos os blocos das sete skills; callback de memória do Mesen disparando nas escritas do DMA e do HDMA registrado como armadilha, com teste próprio (#37).
+- **snes-graficos**: tabela de variantes de LZSS com coluna de segunda fonte (ff5 e ff6 conferidos rodando contra o ff6tools, o resto marcado "uma fonte só"), linha do `wizardry6` corrigida (2048 bytes, 3 a 34, flags invertidas), cabeçalho de cada variante e a página em japonês do Okumura sobre o preenchimento do anel (#33).
 
 ## v0.2
 
