@@ -10,8 +10,8 @@ Documentos usados nas skills, com o que cada um cobre e o quanto é confiável. 
 | [SNESdev wiki](https://snes.nesdev.org/wiki/) | Comunidade NESdev/SNESdev | Registradores, timing, init, vblank, HDMA, color math, janelas, sprites | Alta |
 | [Documentos do anomie](https://wiki.superfamicom.org/) | anomie | Timing, mapa de memória, custos de DMA e HDMA | Média: antigos, com um erro conhecido no MEMSEL |
 | [Datasheet do W65C816S](https://www.westerndesigncenter.com/wdc/documentation/w65c816s.pdf) | Western Design Center | Núcleo 65816: registradores, flags, opcodes, vetores | Alta |
-| [Manual do asar](https://github.com/RPGHacker/asar) | RPGHacker e colaboradores | Sintaxe, diretivas e mapeamento do montador | Alta |
-| [Mesen 2 / MesenCE](https://github.com/nesdev-org/MesenCE) | Sour e colaboradores | Debugger, CDL, API Lua e modo de teste, lidos no código | Alta |
+| [Manual do asar](https://github.com/RPGHacker/asar) | RPGHacker e colaboradores | Sintaxe, diretivas e mapeamento do montador; no código da tag v1.91, conta sem precedência, `asar 1.90` e o aviso de depreciação | Alta |
+| [Mesen 2 / MesenCE](https://github.com/nesdev-org/MesenCE) | Sour e colaboradores | Debugger, CDL, API Lua e modo de teste, lidos no código; callbacks de memória disparando no DMA e HDMA (tag 2.2.1) | Alta |
 | [bsnes](https://github.com/bsnes-emu/bsnes) | byuu (Near) e colaboradores | Desempate de comportamento de hardware; temporização de refresh, NMI e IRQ lida no código; janela de escrita na CGRAM | Apoio |
 | [ares](https://github.com/ares-emulator/ares) | Near e mantenedores do ares | Desempate de comportamento de hardware (HDMA) | Apoio |
 | [sd2snes / FXPAK](https://sd2snes.de/blog/compatibility) | ikari_01 (mrehkopf) | Lista oficial de incompatibilidades do flash cart (SPC7110, ST-011, ST-018) | Alta |

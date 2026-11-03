@@ -66,6 +66,8 @@ endmacro
 %mover($10, $0200)
 ```
 
+Conta no asar 1.x vai da esquerda para a direita, sem precedência, a menos que o arquivo principal comece com `asar 1.90` (dois dígitos; `asar 1.9` é erro) [asar]. Como define é texto, `!a = 1+2` com `db !a*3` dá 9 sem `asar 1.90` e 7 com ele [Teste local]. Use parênteses sempre que misturar operadores, ou `#=`; detalhes na armadilha 11 de `snes-assembly/references/armadilhas.md`.
+
 Defines começam com `!`, parâmetros de macro aparecem como `<nome>` e a chamada é `%nome(...)` [asar]. `-D nome=valor` na linha de comando cria define de fora (bom pra build de depuração) [asar].
 
 ## Arquivos

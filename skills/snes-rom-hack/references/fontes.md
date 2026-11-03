@@ -21,7 +21,7 @@ Pesquisa feita em 26/10/2026 e revisada em 02/11/2026 (issue #13). Cada fato té
 | [sd2snes] | Firmware `src/smc.c` e FPGA `verilog/sd2snes_base/address.v`, commit b081ff9 (01/11/2026), https://github.com/mrehkopf/sd2snes | ikari_01 (mrehkopf) | Como o FXPAK/sd2snes detecta o mapeamento, mapeia ExLoROM e dimensiona a SRAM | Alta pro que o código faz; sem teste em hardware |
 | [LunarExpand] | Lunar Expand 1.20, https://fusoya.eludevisibility.org/le/ | FuSoYa, atualizado em 01/07/2022 | Suporte a ExLoROM por versão do Snes9x e do ZSNES | Média-alta (autor da ferramenta de expansão mais usada) |
 | [z3randomizer] | Estrutura pública do repositório, https://github.com/KatDevsGames/z3randomizer (licença MIT, último commit em 30/11/2025) | KatDevsGames e colaboradores | Exemplo de hack grande organizado em asar: um arquivo por recurso, hooks e RAM em arquivos próprios, ROM base fora do repositório | Média: só a estrutura e o script de build, sem ler código de jogo |
-| [Teste local] | asar 1.91 e MesenCE 2.2.1 (`--testRunner`), ROM base própria de bytes zerados, 02/11/2026 | esta pesquisa | Projeto mínimo montado e rodado, autoexpansão, checksum de tamanhos irregulares por quatro métodos, espelho de ROM no Mesen | Alta pro que foi rodado |
+| [Teste local] | asar 1.91 e MesenCE 2.2.1 (`--testRunner`), ROM base própria de bytes zerados, 02/11/2026 | esta pesquisa | Projeto mínimo montado e rodado, autoexpansão, checksum de tamanhos irregulares por quatro métodos, espelho de ROM no Mesen; em 03/11/2026, define com conta montado com e sem `asar 1.90` | Alta pro que foi rodado |
 
 ## Não consultadas
 

@@ -4,7 +4,7 @@ Código original, escrito para esta skill, na sintaxe do asar. Todos os trechos 
 
 Convenções: código no banco `$00` (LoROM, `org $008000`), DB = `$00`, variáveis na WRAM baixa, X e Y em 16 bits o tempo todo.
 
-Cuidado com expressões no asar 1.91: sem `asar 1.9` no topo do arquivo, ele faz a conta da esquerda para a direita, sem precedência (`2+3*4` dá 20, com um aviso de que o comportamento vai mudar) [Teste local]. Os trechos usam parênteses sempre que a conta mistura operadores.
+Cuidado com expressões no asar 1.91: sem `asar 1.90` no topo do arquivo (com dois dígitos: `asar 1.9` é erro), ele faz a conta da esquerda para a direita, sem precedência (`2+3*4` dá 20, com um aviso de que o comportamento vai mudar) [Teste local]. Os trechos usam parênteses sempre que a conta mistura operadores.
 
 ```asm
 !quadro_pronto  = $0020     ; 1 byte: o laço terminou o quadro
