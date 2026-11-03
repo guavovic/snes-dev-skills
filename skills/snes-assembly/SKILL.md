@@ -45,6 +45,7 @@ O 65816 é um 6502 estendido pra 16 bits e 24 bits de endereço. No SNES ele rod
 - **RTS/RTL trocados**: pilha desalinhada, retorno pra endereço errado.
 - **Interrupção** que salva registrador em 8 bits e perde o byte alto.
 - **Sintaxe de outro montador** colada no asar: MVN invertido, `.a16` inexistente, `z:`/`a:`/`f:` do ca65 viram erro.
+- **Conta sem precedência**: no asar 1.x, sem `asar 1.90` no topo, `2+3*4` dá 20 (só com aviso). Use parênteses sempre que misturar operadores; `asar 1.9` (um dígito) é erro.
 
 ## Fatos rápidos
 
@@ -70,6 +71,6 @@ O 65816 é um 6502 estendido pra 16 bits e 24 bits de endereço. No SNES ele rod
 | Armadilhas com sintoma e conserto, tabela asar x ca65 x WLA-DX | `references/armadilhas.md` |
 | De onde veio cada fato, divergências entre fontes | `references/fontes.md` |
 
-Os blocos de código desta skill e dos references foram montados no asar 1.91 em 02/11/2026; o de MVN também rodou no Mesen 2.
+Os blocos de código desta skill e dos references foram montados no asar 1.91 em 02/11/2026; o de MVN também rodou no Mesen 2. Em 03/11/2026 os blocos das sete skills foram montados de novo com e sem `asar 1.90` e deram os mesmos bytes.
 
 Para desmontar uma rotina: ache o opcode em `instrucoes.md` (busque `$A9`), acompanhe REP/SEP/PLP pra saber o tamanho dos imediatos e anote DB e D antes de interpretar endereços.

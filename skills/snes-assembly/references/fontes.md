@@ -18,13 +18,15 @@ Pesquisa feita em 26/10/2026. Cada fato de registrador, bit, ciclo ou endereço 
 | [bsnes] | `bsnes/sfc/cpu/timing.cpp`, `irq.cpp`, `cpu.cpp`, `io.cpp`, commit 78474e5d, https://github.com/bsnes-emu/bsnes | byuu (Near) e colaboradores | Refresh da DRAM, ponto do NMI e do H-IRQ, teste de interrupção no penúltimo ciclo, `irqLock`, `WAI` | Alta (emulador de precisão de ciclo) |
 | [Anomie timing] | "Timing", https://wiki.superfamicom.org/timing | anomie | Refresh, NMI, H-IRQ, saída do `WAI` | Média: o próprio texto marca parte como teoria; bate com o [bsnes] |
 | [SNESdev timing] | "Timing", https://snes.nesdev.org/wiki/Timing | comunidade SNESdev | Clocks por linha, refresh de 40 clocks | Alta |
-| asar 1.91 (teste) | Montagem real dos exemplos e da coluna de sintaxe da tabela de instruções, numa ROM vazia própria | este repositório, 02/11/2026 | Bytes gerados, avisos, apelidos, `autoclean` | Alta para o asar 1.91 |
+| [asar código] | Código do asar na tag v1.91 (commit 6a6dbda): `src/asar/assembleblock.cpp` (comando `asar`, `math pri`, `math round`), `src/asar/asar_math.cpp` (conta nos dois modos e aviso), `src/asar/main.cpp` (padrão por patch), https://github.com/RPGHacker/asar/tree/v1.91 | RPGHacker e colaboradores | Precedência, arredondamento, formato do número da versão, `Estart_of_file`, quando o aviso aparece | Alta |
+| asar 1.91 (teste) | Montagem real dos exemplos e da coluna de sintaxe da tabela de instruções, numa ROM vazia própria; em 03/11/2026, conta com e sem `asar 1.90` e todos os blocos das sete skills montados nos dois modos | este repositório, 02/11/2026 e 03/11/2026 | Bytes gerados, avisos, apelidos, `autoclean`, precedência, divisão, define, `-werror` | Alta para o asar 1.91 |
 
 ## Não consultadas
 
 - Fontes em japonês: buscadas em 02/11/2026 (65816 命令表, サイクル, スーパーファミコン アセンブラ, Wikipédia japonesa). Só apareceu o verbete geral "65816 (コンピュータ)" e páginas que repetem material em inglês; nenhuma fonte técnica primária em japonês de acesso livre. Descartado.
 - Um "primer" de 65816 no 6502.org: não existe com esse nome. O que o site tem são o "65C816 Opcodes" [Clark] e o tutorial de interrupções [6502.org int], os dois usados aqui.
 - Execução do WLA-DX: o binário não pôde rodar neste ambiente; os fatos vêm do código e dos testes do repositório deles.
+- asar 2.0: que ele só faz conta com precedência vem do manual [asar]; a versão beta não foi montada aqui.
 
 ## Divergências registradas
 
@@ -41,3 +43,4 @@ Pesquisa feita em 26/10/2026. Cada fato de registrador, bit, ciclo ou endereço 
 | Ordem do MVN no WLA-DX | (não havia fonte) | [WLA-DX código] teste `mvn $12,$34` = `54 34 12` | origem, destino, como WDC e ca65 |
 | Posição do refresh da DRAM na linha | [Anomie timing]: ~536, o primeiro em 538, "teoria" | [bsnes]: 530 na CPU rev. 1, 538 na rev. 2 | Depende da revisão; os 40 clocks batem em todas |
 | `COP` sem operando | [asar] 1.91 testado: `02 00` | [WLA-DX código]: valor $0200 na tabela, possível `00 02` | Não confirmado no WLA-DX; escrever sempre `COP $xx` |
+| Versão que liga a precedência | [asar] manual 1.9 e 1.91: "`asar 1.9` ou maior" | [asar código] exige dois dígitos depois do ponto; `asar 1.9` dá `Einvalid_version_number` [asar 1.91 (teste)] | `asar 1.90` |

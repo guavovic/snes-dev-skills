@@ -89,6 +89,15 @@ Em `snesWorkRam`, o endereço é o offset dentro da WRAM: `0x0100` é o byte em 
 
 `emu.addMemoryCallback(funcao, tipo, inicio, fim, cpu, memoria)` chama a função com endereço e valor. Tipo em `emu.callbackType`: `read`, `write`, `exec`. Leitura dispara depois da leitura, escrita antes da escrita; devolver um inteiro troca o valor [MesenCE src].
 
+**DMA e HDMA disparam os mesmos callbacks.** No SNES, cada byte copiado pelo DMA geral ou pelo HDMA passa por `SnesMemoryManager::WriteDma`, que registra a operação como `DmaWrite`; no `ScriptManager`, `Write`, `DummyWrite` e `DmaWrite` caem no callback `write`, e `DmaRead` cai no `read` [MesenCE src][Mesen2 src]. A função Lua recebe só endereço e valor, sem o tipo da operação, então não dá para separar CPU de DMA pelo argumento. Teste de 03/11/2026 numa ROM própria [Teste local]: HDMA no canal 0, modo 2, em `$210D`, tabela de 4 entradas de 16 linhas, e a CPU escrevendo `$210D` duas vezes no vblank. O callback de escrita em `$210D` rodou 10 vezes por quadro (8 do HDMA, nas linhas 0, 16, 32 e 48, e 2 da CPU, na linha 225); um DMA geral de 4 bytes para `$2180` disparou 4 vezes. Nas escritas do HDMA, `cpu.pc` era o da instrução que a CPU estava executando naquele momento. O callback de leitura também disparou nas leituras da tabela do HDMA.
+
+Para conferir só o que a CPU escreveu:
+
+- filtre pela posição: `emu.getState()["ppu.scanline"]`, sabendo em que linhas o HDMA roda;
+- use um callback `exec` no endereço da instrução que grava e leia o valor ali;
+- desligue o HDMA (`$420C` = 0) no teste que não depende dele;
+- confira o valor esperado em vez de contar chamadas.
+
 ### Entrada
 
 - `emu.setInput(tabela, porta, subporta)`: botões em `a b x y l r start select up down left right`; a porta 0 é o jogador 1. O estado vale até o próximo `inputPolled`; botão não citado fica com o jogador.

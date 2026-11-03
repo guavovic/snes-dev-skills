@@ -1,5 +1,9 @@
 # Mudanças
 
+## [Não lançado]
+
+- **snes-assembly**, **snes-rom-hack**, **snes-tecnicas**, **snes-testes**: conta sem precedência do asar 1.x documentada como armadilha (`asar 1.90` com dois dígitos, define, divisão) e conferida em todos os blocos das sete skills; callback de memória do Mesen disparando nas escritas do DMA e do HDMA registrado como armadilha, com teste próprio (#37).
+
 ## v0.2
 
 Revisão das sete skills: todos os exemplos em asar foram montados no asar 1.91 e rodados no Mesen 2.2.1 com ROM própria, as pendências da v0.1 foram conferidas no código dos emuladores e em fonte oficial, e o que não fechou foi para issues com o marco v0.3.
