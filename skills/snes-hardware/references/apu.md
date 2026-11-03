@@ -1,6 +1,6 @@
 # APU: SPC700, DSP e portas $2140-$2143 (visão geral)
 
-O som é um subsistema separado, com processador, RAM e relógio próprios. A CPU principal só conversa com ele por 4 portas de 8 bits [fullsnes: APU] [SNESdev wiki: Booting the SPC700]. A programação do driver de som fica para uma skill própria; aqui vai o que a CPU principal precisa saber.
+O som é um subsistema separado, com processador, RAM e relógio próprios. A CPU principal só conversa com ele por 4 portas de 8 bits [fullsnes: APU] [SNESdev wiki: Booting the SPC700]. Aqui vai o que a CPU principal precisa saber; registradores do DSP, formato BRR e um driver mínimo testado ficam em [spc700-e-brr.md](spc700-e-brr.md).
 
 ## Componentes
 

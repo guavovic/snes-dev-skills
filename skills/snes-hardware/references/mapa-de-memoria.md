@@ -93,7 +93,7 @@ ABORT não tem fonte de sinal no SNES [fullsnes]. Os handlers precisam estar no 
 
 ## Chips especiais do cartucho (visão geral)
 
-Detalhe fica fora desta skill. Contagens de jogo segundo o [fullsnes].
+Registradores, mapa e header de cada chip em [chips-de-cartucho.md](chips-de-cartucho.md). Contagens de jogo segundo o [fullsnes].
 
 | Chip | O que é | Onde aparece |
 |---|---|---|

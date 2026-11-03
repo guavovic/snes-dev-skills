@@ -38,7 +38,16 @@ Entrada da tabela (uma word por coluna):
 - **Colunas:** a primeira coluna visível nunca é afetada; a entrada 0 vale para a segunda coluna. Com o scroll fino, até 33 tiles aparecem por linha. Cada entrada vale para a coluna inteira, em todas as linhas da tela.
 - **Qual linha do BG3 é lida:** o HOFS e o VOFS do BG3 escolhem a posição da tabela no tilemap, com os 3 bits baixos ignorados. Com BG3 em tiles de 16x16, a linha do vertical é lida como se o VOFS tivesse 8 a mais; no modo 6, tiles de 8x8 são tratados como 16x8 [SNESdev wiki: Offset-per-tile].
 
-Uso típico: colunas que ondulam na vertical (água, calor) ou chão com perspectiva por coluna. Não foi testado no Mesen nesta entrega.
+Uso típico: colunas que ondulam na vertical (água, calor) ou chão com perspectiva por coluna.
+
+Teste local no MesenCE 2.2.1, modo 2, ROM própria com BG1 de tiles de cor sólida e scroll zerado, lendo a tela com `emu.getScreenBuffer()` [Teste local]:
+
+- A coluna 0 da tela não mudou; a entrada 0 da tabela agiu na coluna 1 (pixels 8-15).
+- Entrada horizontal `$20F5` (BG1, 245): a coluna inteira mostrou o tile da posição 240. Os 3 bits baixos foram ignorados e o scroll fino continuou vindo do BG1HOFS (0).
+- Entrada vertical `$2080` (BG1, 128) na posição 2: só a coluna 3 desceu 16 tiles.
+- Entrada `$4080` (só bit 14, BG2) na posição 4: o BG1 dessa coluna não mudou.
+
+O resultado bate com o [SNESdev wiki: Offset-per-tile] e o [fullsnes].
 
 ## Tiles (formato planar)
 
