@@ -69,6 +69,8 @@ Ninguém lê um campo só. As ferramentas pontuam os candidatos e escolhem o mai
 - +2 se o map mode de `$FFD5` bate com o offset.
 - Os candidatos `$40xxxx` (ROM acima de 4 MB) ganham +4.
 
+**Mesen** (`BaseCartridge.cpp`) testa as bases `0`, `$8000`, `$400000` e `$408000`, cada uma com e sem os 512 bytes de cabeçalho de copiador, e soma, entre outros, +8 quando checksum + complemento = `$FFFF` e os dois são diferentes de zero [MesenCE]. O log de carga mostra o resultado ("Type: LoROM", "Type: ExLoROM") [Teste local].
+
 **asar** (`setmapper`) dá pontos pros caracteres do título que parecem texto e descarta candidato cujo complemento não bate; sem vencedor, fica em LoROM [asar].
 
 O SNESdev lista as mesmas pistas: título legível, map mode coerente, checksum + complemento = `$FFFF` e vetor de RESET plausível [SNESdev].
@@ -111,6 +113,29 @@ def checksum_snes(rom: bytes, offset_cabecalho: int) -> int:
     return (sum(dados[:primeira]) + sum(resto) * repeticoes) & 0xFFFF
 ```
 
-Ele cobre o caso "potência de 2 + uma potência de 2 menor", que é o de toda ROM comercial e o que o asar trata. Resto que não é potência de 2: não confirmado; prefira expandir pra um tamanho regular.
+Ele cobre o caso "potência de 2 + uma potência de 2 menor", que é o de toda ROM comercial, e dá o mesmo valor que o asar grava.
+
+### Tamanho fora do padrão: as ferramentas discordam
+
+Cada ferramenta faz uma conta diferente quando o resto não é potência de 2:
+
+- **asar:** repete o resto `primeira / resto` vezes, arredondando pra baixo; o comentário do código diz que tamanho fora do padrão é problema de quem usa [asar].
+- **Snes9x:** espelho recursivo (herdado do NSRT), que divide o resto de novo em potências de 2; se o tamanho não é múltiplo de 32 KB, soma os bytes sem espelho. O resultado aparece na informação da ROM como "Checksum OK" ou "Invalid Checksum" [snes9x].
+- **SNESdev:** completa o resto com zeros até a próxima potência de 2 e repete; o próprio texto avisa que os emuladores não são consistentes [SNESdev].
+- **Mesen e bsnes:** não recalculam. Só pontuam `checksum + complemento = $FFFF` na detecção do mapeamento [MesenCE][bsnes].
+
+Conferido com ROMs próprias de bytes aleatórios montadas no asar 1.91 [Teste local]:
+
+| Tamanho | asar (gravado) | Snes9x | SNESdev |
+|---|---|---|---|
+| 1536 KB (1 MB + 512 KB) | `$68B0` | `$68B0` | `$68B0` |
+| 3072 KB (2 MB + 1 MB) | `$EF98` | `$EF98` | `$EF98` |
+| 1000 KB (não múltiplo de 32 KB) | `$66AE` | `$66AE` (soma simples) | `$66AE` |
+| 1792 KB (1 MB + 768 KB) | `$7E4E` | `$59E3` | `$7E4E` |
+| 1344 KB (1 MB + 320 KB) | `$06F3` | `$90A4` | `$ECB2` |
+
+Regra prática: com tamanho que é potência de 2 ou soma de duas potências de 2, todo mundo concorda. Fora disso não existe resposta certa; o Mesen carrega do mesmo jeito (o checksum só pesa na detecção), mas o Snes9x acusa "Invalid Checksum". Expanda pra um tamanho regular.
+
+O Mesen também espelha mal a ROM irregular: arredonda o tamanho pra 4 KB e, na região espelhada, todas as páginas de 4 KB apontam pra primeira página da parte extra (o laço em `BaseCartridge.cpp` anda de `$1000` em `$1000` sobre uma contagem que já está em páginas) [MesenCE]. Exemplo medido: numa ROM de 3 MB, `$E0:9000` leu a página `$200` em vez da `$201`; o log mostra "ROM size" arredondado pra cima (1792 KB aparece como 2048 KB) [Teste local]. Mais um motivo pra não depender de espelho.
 
 No asar o checksum é corrigido automaticamente, a não ser em `norom` ou modo xkas; `--fix-checksum=on|off` força [asar].

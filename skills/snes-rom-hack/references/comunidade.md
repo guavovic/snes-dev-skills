@@ -2,7 +2,17 @@
 
 ## SMW Central
 
-Maior comunidade de ROM hacking de SNES, centrada em Super Mario World, e de onde vem o asar [asar]. A convenção é enviar patch, nunca ROM, com BPS como formato preferido [SMWC-2ª]. A página oficial de regras de envio não foi lida; o fato vem de fonte secundária (ver `fontes.md`).
+Maior comunidade de ROM hacking de SNES, centrada em Super Mario World, e de onde vem o asar [asar]. O site ao vivo pede verificação humana; as regras abaixo vêm das páginas oficiais arquivadas no Internet Archive (datas em `fontes.md`) [SMWC].
+
+Regras de envio de hack (seção Hacks):
+
+- **Só BPS.** O envio é um ZIP com o patch BPS, mais créditos e README opcionais. Mais de um BPS que não seja versão alternativa é rejeitado na hora, e patch quebrado ou em formato inválido também, "incluindo patches IPS" [SMWC].
+- **Tem que rodar na última versão estável do bsnes ou do Snes9x**, com a configuração padrão. Parte da moderação testa em console [SMWC].
+- **Pelo menos três capturas de tela** tiradas de emulador, enviadas fora do ZIP [SMWC].
+- **No máximo dois envios** esperando moderação por conta; o terceiro é removido [SMWC].
+- **ROM nunca.** Subir ROM ou linkar site que distribui ROM comercial é contra as regras; o BPS só carrega a diferença e quem baixa aplica na própria ROM com o Floating IPS [SMWC][flips].
+
+A fonte secundária [SMWC-2ª] dizia "BPS preferido"; a regra oficial é mais dura: IPS é recusado.
 
 Convenções que nasceram lá e servem fora do SMW: RATS, `autoclean`, `freecode`/`freedata` [asar].
 
@@ -12,10 +22,19 @@ Arquivo histórico de hacks, traduções, utilitários e documentos de todas as 
 
 ## Etiqueta de distribuição
 
-- Distribua patch (BPS), nunca ROM [SMWC-2ª][flips].
+- Distribua patch (BPS), nunca ROM [SMWC][flips].
 - Diga qual é a ROM base (nome, região, revisão e hash) no README.
 - Credite patches e ferramentas de terceiros usados e respeite a permissão de quem fez.
 
 ## Hacks grandes como referência
 
-O escopo pedia hacks grandes como exemplo de boas práticas. Nenhuma fonte lida nesta pesquisa documenta as práticas de um hack específico, então ficou de fora em vez de citar de memória. O que as fontes lidas mostram como prática comum: patch BPS, ROM base identificada, código montado com asar e espaço livre marcado com RATS.
+Projeto aberto serve de modelo de organização. Aqui só a estrutura pública do repositório, sem código de jogo.
+
+**z3randomizer** (base em asm do randomizador de A Link to the Past, licença MIT) [z3randomizer]:
+
+- **Um arquivo por recurso** (`boots.asm`, `hud.asm`, `save.asm`...) e um arquivo raiz que inclui todos.
+- **Hooks separados** num `hooks.asm`, longe da lógica nova: dá pra ver de uma vez tudo o que muda no código original.
+- **Endereços em arquivo próprio:** `ram.asm`, `sram.asm`, `registers.asm` e `vanillalabels.asm` (rótulos do jogo original) concentram os números mágicos.
+- **ROM fora do repositório:** o `build.sh` copia `../alttp.sfc` pra `../working.sfc` e roda o asar nessa cópia, o mesmo princípio de `fluxo-git-e-build.md`.
+
+O que as fontes lidas mostram como prática comum: patch BPS, ROM base identificada, código montado com asar e espaço livre marcado com RATS [SMWC][asar]. Outros projetos grandes (Super Metroid Map Rando, VARIA) não foram lidos.
