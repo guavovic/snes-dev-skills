@@ -18,6 +18,8 @@ Consequência pra jogo que não é SMW: se a ROM original tem mais de 512 KB, a 
 - asar 2.0: `freespace ...,start=$xxxxxx` pra começar a busca onde você sabe que é livre [asar]; ou
 - `org` direto numa área provada livre, com `assert pc() <= $fim` no final pra não estourar.
 
+Hack grande com muitos patches costuma ficar com a terceira saída e manter no repositório um mapa de quem usa cada faixa: um arquivo por banco com as faixas e o patch dono, mais uma lista dos trechos do jogo sobrescritos, e uma checagem no build que acusa dois patches no mesmo byte [MapRando][VARIA]. Outra forma é um arquivo com o início e o fim da área livre de cada banco e macros que abrem e fecham a área com `assert` e `warnpc` [SMPractice]. Detalhes em `comunidade.md`.
+
 ## Anatomia de um hook com JSL
 
 Objetivo: no endereço X do jogo, desviar pra rotina nova e voltar.

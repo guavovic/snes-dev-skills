@@ -29,6 +29,14 @@ Documentos usados nas skills, com o que cada um cobre e o quanto é confiável. 
 | [Capstone](https://github.com/capstone-engine/capstone) | equipe do Capstone | Desmontagem 65816 por script, modos de M e X, lida no código e rodada na 5.0.7 | Alta |
 | [sm_disassembly](https://github.com/InsaneFirebat/sm_disassembly) | InsaneFirebat | Organização da desmontagem do Super Metroid que monta no asar (só a estrutura) | Média |
 | [z3randomizer](https://github.com/KatDevsGames/z3randomizer) | KatDevsGames e colaboradores | Organização de um hack grande aberto em asar (só a estrutura) | Média |
+| [Super Metroid Map Rando](https://github.com/blkerby/MapRandomizer) | maddo, kyleb e colaboradores | Patches em asar montados sem ROM, mapa de espaço livre por banco e checagem de conflito (só a estrutura) | Média |
+| [VARIA Randomizer](https://github.com/theonlydude/RandomMetroidSolver) | theonlydude e colaboradores | Variantes em pastas, build com make, símbolos e checagem de sobreposição de IPS (só a estrutura) | Média |
+| [Super Metroid Practice Hack](https://github.com/tewtal/sm_practice_hack) | tewtal e colaboradores | Versão do asar fixada, espaço livre por banco com macros, IPS gerado sem a ROM (só a estrutura) | Média |
+| [ALTTP + SM Combo Randomizer](https://github.com/tewtal/alttp_sm_combo_randomizer_rom) | tewtal e colaboradores | Dois jogos numa ROM ExHiROM e mapa da ROM escrito à mão (só a estrutura) | Média |
+| [DQ6 Extended: considerações](https://retrogamehackers.net/dq6-extended-001/) | dq_492 (Retro Game Hackers) | Relato em japonês de um patch base de expansão: save, espaço livre, texto descomprimido | Média-baixa |
+| [DQバイナリ改造 @Wiki: ROM拡張](https://w.atwiki.jp/dq_binary/pages/20.html) | anônimo, 2006 | Wiki em japonês: expansão HiROM e ExHiROM, SRAM por banco, WRAM como gargalo | Baixa-média |
+| [マリオ４改造 @wiki](https://w.atwiki.jp/sm4wiki_mix/) | anônimos | Wiki japonesa de Super Mario World: ferramentas e indicação do SMW Central | Baixa-média |
+| [Retro Game Laboratory: LoROM para HiROM](https://www.retrogamelaboratory.com/2024/06/loromhirom.html) | 井上ジャンゴ, 2024 | Conversão de LoROM em HiROM relatada em japonês, não confirmada | Baixa |
 | [Lunar Compress](https://fusoya.eludevisibility.org/lc/index.html) | FuSoYa | Catálogo de formatos de compressão e os números da DLL, conferidos no pacote oficial v2.00 | Alta |
 | [sfc-comp](https://github.com/sfc-comp/sfc-comp) | sfc-comp (MIT) | Compressores de jogos de SNES reimplementados: LC_LZ11 e variantes de LZSS | Média/alta |
 | [ff6tools](https://github.com/everything8215/ff6tools) | everything8215 (GPL-3.0) | Compressor e descompressor do LZSS do FF5 e do FF6, segunda fonte desses formatos, rodado com dados sintéticos | Média/alta |
