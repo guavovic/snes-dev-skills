@@ -32,7 +32,7 @@ Como transformar bytes de uma ROM em código entendido e nomeado. Este arquivo t
 - **Jump table indexada.** `JMP (abs,X)` e `JSR (abs,X)` pulam pra endereços que nenhum desmontador linear segue. Marque a tabela como ponteiros e crie labels em cada destino. Ver `references/variaveis-e-tabelas.md`.
 - **CDL de outra versão da ROM.** O arquivo CDL do Mesen guarda o CRC32 da ROM; arquivo sem CRC (formato antigo) carrega só com aviso [MesenCE src]. Revisão diferente do jogo muda endereços.
 - **Leitura que tem efeito colateral.** Ler registrador de hardware num script ou janela de memória pode mudar o estado. No Lua do Mesen, os tipos `*Debug` (por exemplo `emu.memType.snesDebug`) leem sem efeito colateral [MesenCE src].
-- **CDL do Mesen não abre no DiztinGUIsh.** Formato e flags são outros, e o Mesen marca operando com a mesma flag do opcode; é preciso converter [DiztinGUIsh src][Teste local].
+- **CDL do Mesen não abre no DiztinGUIsh.** Formato e flags são outros, e o Mesen marca operando com a mesma flag do opcode; é preciso converter, e o script `references/cdl_mesen_para_bizhawk.py` faz isso [DiztinGUIsh src][BizHawk src][Teste local].
 - **Condição do trace com número sem `$`.** No Mesen número sem prefixo é decimal, e condição inválida é descartada: o trace grava tudo [MesenCE src]. Sintaxe em `references/codigo-e-dados.md`.
 - **Tabela .tbl com código de controle.** Cada ferramenta escreve códigos de controle de um jeito; o Mesen só carrega entradas simples `HEX=texto` [Data Crystal TBL][MesenCE src].
 
@@ -41,9 +41,10 @@ Como transformar bytes de uma ROM em código entendido e nomeado. Este arquivo t
 | Arquivo | O que tem |
 |---|---|
 | `references/ferramentas.md` | Mesen 2 / MesenCE, bsnes-plus, DiztinGUIsh (e por que o CDL do Mesen não importa direto), Ghidra (ghidra-65816, ghidra-snes), desmontadores de linha de comando e o Capstone testado: o que cada um faz bem e seus limites |
-| `references/codigo-e-dados.md` | CDL do Mesen (flags, formato do arquivo, Generate ROM), trace logger, formato e sintaxe da condição, usage map do bsnes-plus, como acompanhar M e X |
+| `references/codigo-e-dados.md` | CDL do Mesen (flags, formato do arquivo, Generate ROM, conversão para o DiztinGUIsh), trace logger, formato e sintaxe da condição, usage map do bsnes-plus, como acompanhar M e X |
 | `references/variaveis-e-tabelas.md` | Busca de valor na RAM, breakpoints de leitura e escrita, contadores de acesso, callback de memória em Lua, tabelas de ponteiros, jump tables, tabelas de texto .tbl |
 | `references/organizacao-de-projetos.md` | Labels (.mlb, .sym), mapa de RAM e de ROM, como se organizam as desmontagens de SMW, ALttP, Super Metroid, EarthBound e o estilo pret |
+| `references/cdl_mesen_para_bizhawk.py` | Script próprio (Python 3, sem dependências): CDL do Mesen para o CDL do BizHawk que o DiztinGUIsh importa; testes em `test_cdl_mesen_para_bizhawk.py` |
 | `references/fontes.md` | Fontes, confiança, divergências e o que não foi confirmado |
 
 ## Relação com outras skills

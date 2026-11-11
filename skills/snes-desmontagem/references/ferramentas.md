@@ -54,7 +54,7 @@ Fontes da tabela: importador do BizHawk no DiztinGUIsh [DiztinGUIsh src] e `Code
 Caminhos que funcionam:
 
 1. **Usar a fonte que o DiztinGUIsh já lê**: usage map ou trace do bsnes-plus, ou CDL do BizHawk.
-2. **Converter por script**: ler o `.cdl` do Mesen (ou `emu.getCdlData` no Lua) e gerar o formato do BizHawk. Como o Mesen não separa opcode de operando, o script precisa decodificar o tamanho de cada instrução a partir do primeiro byte de cada trecho de código, com o M e o X gravados; é o mesmo laço do exemplo do Capstone abaixo. Esse conversor não foi escrito nem testado no DiztinGUIsh aqui (não confirmado).
+2. **Converter por script**: ler o `.cdl` do Mesen (ou `emu.getCdlData` no Lua) e gerar o formato do BizHawk. Como o Mesen não separa opcode de operando, o script precisa decodificar o tamanho de cada instrução a partir do primeiro byte de cada trecho de código, com o M e o X gravados; é o mesmo laço do exemplo do Capstone abaixo. O script `cdl_mesen_para_bizhawk.py` faz isso, com testes automatizados em arquivos sintéticos; uso e limites em [codigo-e-dados.md](codigo-e-dados.md). A importação do arquivo gerado no DiztinGUIsh ainda não foi feita na interface (não confirmado).
 
 No repositório há um pedido aberto de suporte a CDL do Mesen 2, só para NES (issue 127, de 06/01/2026), e a PR 134, aberta em 24/09/2026, renomeia a captura ao vivo "em antecipação à integração com o Mesen" [DiztinGUIsh src]. Ou seja, é plano, não recurso lançado.
 
