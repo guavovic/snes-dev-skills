@@ -38,6 +38,7 @@ Endereço SNES = `$BB:AAAA` (banco:endereço). Offset = posição no arquivo sem
   - **FXPAK / sd2snes:** o firmware não procura cabeçalho em `$407FB0`, mas acha o de LoROM em `$7FB0` e escolhe o mapeador LoROM. Na FPGA esse mapeador monta o endereço com o bit 23 invertido no lugar do bit 22, o que já é o layout ExLoROM (`$80+` a partir de 0, `$00-$7F` a partir de `$400000`) [sd2snes]. Lido no código, sem teste em hardware.
   - **SN Operator:** não lista ExLoROM [Epilogue]. **Super EverDrive:** firmware fechado, não confirmado.
   - Teste no alvo antes de escolher; ExHiROM tem suporte mais uniforme.
+- **ROM de teste pronta: `teste-exlorom.asm`** (com `teste-exlorom.lua` pro Mesen). Cada bloco de 32 KB da ROM tem uma marca em `$7F00`; a ROM lê `$bb:FF00` em todos os bancos menos `$7E`/`$7F`, mostra na tela que bloco apareceu em cada grupo de 16 bancos, quantos bancos fogem do mapa ExLoROM (EX) e do LoROM comum (LO) e um veredito. Gera 8 MB; `-DMB=6` gera 6 MB, o teto do Super EverDrive X6 (7,5 MB). No MesenCE 2.2.1, a de 8 MB sai "Type: ExLoROM", EX 00, LO 7E e EXLOROM, e os 254 bancos batem com o `emu.convertAddress` do próprio Mesen; a de 6 MB também dá EXLOROM, mas os bancos `$40-$7D` mostram "--", porque o espelho de ROM irregular do Mesen aponta todas as páginas pro começo da segunda metade (ver `cabecalho-e-checksum.md`); sem o cabeçalho de `$407FC0` o Mesen escolhe LoROM e a ROM mostra LOROM, EX 7E, LO 00 [MesenCE][Teste local]. No FXPAK e no Super EverDrive ainda não foi medida.
 
 ## Expandir a ROM
 
@@ -59,6 +60,12 @@ O asar expande sozinho quando um `freespace` não acha lugar em LoROM: 512 KB ->
 4. **Revise o jogo:** rotina que zera a SRAM, que soma (checksum) ou que testa o tamanho pode assumir o tamanho antigo. SRAM costuma ter checksum, então patch de SRAM normalmente vem junto com patch desse cálculo [fullsnes].
 5. **Janela da SRAM em LoROM muda com o tamanho da ROM.** Mesen: ROM de 2 MB ou mais põe a SRAM só em `$70-$7D:0000-7FFF`; abaixo disso, o banco inteiro [MesenCE]. Snes9x: só até `$7FFF` quando a ROM passa de 2 MB ou a SRAM passa de 32 KB [snes9x]. SRAM maior que 32 KB numa ROM grande ocupa vários bancos (`$70`, `$71`...).
 6. **Flash carts.** FXPAK / sd2snes: o firmware aceita `1024 << n` sem teto e reserva 1 MB pra save; a FPGA põe a SRAM de LoROM em `$70-$7F`/`$F0-$FF` e, com ROM acima de 2 MB (`$FFD7` = `$0C`, máscara da ROM com o bit 21), só nos 32 KB de baixo; com ROM menor a metade de cima espelha a de baixo (o endereço não usa A15), então o banco inteiro de 64 KB não funciona como no Mesen. HiROM e ExHiROM: `$20-$3F:6000-7FFF`, até 256 KB endereçáveis [sd2snes]. Lido no código, sem teste em hardware. Super EverDrive: não confirmado.
+7. **ROM de teste pronta: `teste-sram.asm`** (com `teste-sram.lua` pro Mesen). LoROM que grava uma marca diferente no começo de cada metade de banco `$70-$7D` e em `$F0`/`$FF`, relê, mostra na tela qual sonda é espelho de qual, os KB distintos e o tamanho dentro do banco `$70`, e um contador de boot em `$70:0010` pra ver se a SRAM sobrevive ao reset e ao desligar. Gera ROM de 32 KB com `$FFD8` = `$07` (128 KB); `-DSRAM=n` muda `$FFD8` e `-DROM4MB=1` gera ROM de 4 MB. No MesenCE 2.2.1, igual ao `RegisterHandlers` [MesenCE][Teste local]:
+   - ROM de 32 KB e 128 KB: banco inteiro de SRAM (`$70:8000` é diferente de `$70:0000`), repete a cada 2 bancos, 128 KB vistos;
+   - ROM de 4 MB e 128 KB: `$bb:8000` não tem SRAM, só os 32 KB de baixo, repete a cada 4 bancos, 128 KB;
+   - `$FFD8` = `$08` e `$09`: 256 KB nos dois (o teto do Mesen); `$05`: 32 KB espelhados em todas as sondas; `$01` e `$03`: 2 KB e 8 KB; `$00`: nada;
+   - o contador soma 1 no reset e continua na execução seguinte, porque o Mesen grava o `.srm` ao fechar.
+   No FXPAK e no Super EverDrive ainda não foi medida. Pelo código do sd2snes, a ROM de 32 KB deveria mostrar `$70:8000` espelhando `$70:0000` (o endereço não usa A15), ao contrário do Mesen.
 
 Exemplo no asar (LoROM, 8 KB com bateria):
 
