@@ -46,7 +46,9 @@ O que se perde ou fica de fora:
 - O BizHawk não abre o arquivo gerado: ao carregar, ele exige os mesmos blocos que ele mesmo cria (`CARTROM-DB`, `WRAM`, `APURAM` e outros) [BizHawk src]. O arquivo é para o DiztinGUIsh.
 - **M e X misturados.** O Mesen junta as flags com OU a cada execução [MesenCE src]: um byte executado uma vez com M=1 e outra com M=0 fica com M=1, e o script decodifica como 8 bits. Quando isso faz o operando cair num byte que o Mesen não marcou como código, o script avisa (`byte(s) de operando sem a marca de código`). Nesse trecho, confira à mão no DiztinGUIsh.
 
-Testado com ROM e CDL sintéticos montados no próprio teste, sem ROM comercial: `python -m unittest test_cdl_mesen_para_bizhawk -v` nesta pasta (17 testes) [Teste local]. O teste lê o arquivo gerado com uma cópia em Python da lógica do importador do DiztinGUIsh (`BizHawkCdlImporter`), mas a abertura no programa de verdade ainda não foi feita (não confirmado).
+Testado com ROM e CDL sintéticos montados no próprio teste, sem ROM comercial: `python -m unittest test_cdl_mesen_para_bizhawk -v` nesta pasta (17 testes) [Teste local]. O teste lê o arquivo gerado com uma cópia em Python da lógica do importador do DiztinGUIsh (`BizHawkCdlImporter`), e em 11/11/2026 o caminho inteiro foi rodado à mão [Teste local]: uma LoROM própria de 32 KB jogada no MesenCE com o Code/Data Logger ligado, o `.cdl` salvo pela janela do Debugger, convertido pelo script (14 instruções, 17 bytes de operando, 4 bytes de dado) e importado como CDL do BizHawk num projeto LoROM novo do DiztinGUIsh 2.5.1.0. O DiztinGUIsh mostrou `LDA.W #$1234` com M=16 em 3 bytes, `LDA.B #$12` depois de `SEP #$20` em 2 bytes, `LDX.W` e `CPX.W` com X=16, os operandos marcados como Operand e a tabela de 4 bytes lida por `LDA long,X` marcada como Data (8-bit).
+
+Na grade do DiztinGUIsh a coluna Instruction também desmonta as linhas de operando como se fossem opcode (`BMI`, `ORA`, `BRK`); vale a coluna Flag, que diz Operand. A coluna M e X da linha do `REP #$30` mostra 8, o estado de antes da instrução, como no CDL do Mesen.
 
 ## Usage map do bsnes-plus
 
@@ -82,18 +84,20 @@ Exemplos, escritos para este guia:
 
 | Condição | O que registra |
 |---|---|
-| `pc >= $808000 && pc < $808100` | Só o que roda nesse trecho do banco $80 |
-| `iswrite && address == $7E0100` | Instruções que escrevem em $7E0100 por esse endereço de 24 bits |
-| `psmemory == 0` | Só instruções executadas com acumulador de 16 bits |
-| `frame >= 600` | Só a partir do quadro 600 |
+| `pc >= $008000 && pc < $008100` | Só o que roda nesse trecho do banco $00. Rodado: o trace mostrou só as instruções do trecho [Teste local] |
+| `iswrite && address == $7E0100` | Instruções que escrevem em $7E0100 por esse endereço de 24 bits. Rodado: entrou só o `STA $7E0100` [Teste local] |
+| `psmemory == 0` | Só instruções executadas com acumulador de 16 bits. Rodado: entraram `LDA #$1234`, `STA $7E0100` e também o `SEP #$20`, porque a condição vê o estado de antes da instrução [Teste local] |
+| `frame >= 600` | Só a partir do quadro 600, pelo código. Rodado numa ROM com a tela e o NMI desligados, não gravou nada mesmo depois de mais de 10 segundos; causa não confirmada [Teste local] |
 | `[$7E0010] == 3` | Só enquanto o byte $7E0010 vale 3 |
 
 Cuidados:
 
-- **Condição inválida não filtra nada.** Se a expressão não compila, o núcleo descarta a condição e o trace grava tudo; a janela mostra o aviso "Condition contains invalid syntax or symbols" [MesenCE src].
+- **Condição inválida não filtra nada.** Se a expressão não compila, o núcleo descarta a condição e o trace grava tudo; o código prevê o aviso "Condition contains invalid syntax or symbols" na janela [MesenCE src]. Rodado com `pc >>> 3`: o trace gravou tudo, mas nenhum aviso apareceu [Teste local]. Se o trace vier cheio demais, desconfie da condição antes de desconfiar do jogo.
+- **Cada processador tem a própria condição.** A janela do trace logger tem uma aba por CPU (SNES, SPC e os coprocessadores do cartucho), e a condição escrita numa aba não filtra as outras: com só a aba do SNES filtrada, as linhas do SPC continuaram entrando [Teste local]. Desligue o log das CPUs que não interessam.
+- **Reset fica no Debugger.** A janela do trace logger não tem Reset; para gravar desde o começo, ligue o log e use Debug > Reset na janela do Debugger [Teste local].
 - **`address` é o endereço do acesso como a CPU o fez.** A mesma variável da WRAM pode aparecer como `$000100` ou `$7E0100` conforme o banco usado (espelhos em `snes-hardware`). Para pegar todos os espelhos, use `iswrite && memaddress == $100` (offset na WRAM; o valor não diz o tipo de memória, então um offset igual na SRAM também bate) ou um breakpoint de escrita com tipo de memória Work RAM, que compara pelo offset dentro da WRAM [MesenCE src].
 - A documentação online é do Mesen antigo (NES, 0.9.9) e lista valores de NES como `Sprite0Hit`; no SNES valem os nomes acima [Mesen docs][MesenCE src].
-- A janela do trace logger é da interface: não há função Lua para ligar o trace nem para avaliar expressão, então a sintaxe foi conferida no código e na ajuda embutida, não executada [MesenCE src].
+- A janela do trace logger é da interface: não há função Lua para ligar o trace nem para avaliar expressão [MesenCE src]. Os exemplos marcados como rodados acima foram conferidos à mão na janela em 11/11/2026, numa LoROM própria [Teste local]; o de `[$7E0010]` só foi conferido no código.
 
 Trace longo cresce rápido. Ligue o trace só em volta do evento (com breakpoint) ou use a "trace mask" do bsnes-plus, que registra cada endereço uma vez só [bsnes-plus].
 
