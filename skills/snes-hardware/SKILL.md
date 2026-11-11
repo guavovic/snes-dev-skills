@@ -64,6 +64,7 @@ Toda afirmação técnica dos references tem fonte entre colchetes (`[fullsnes]`
 | [chips-de-cartucho.md](references/chips-de-cartucho.md) | SA-1, GSU, CX4, DSP-n, S-DD1 e SPC7110: mapa, registradores essenciais e header |
 | [exemplos.md](references/exemplos.md) | Esqueleto LoROM em asar (init, DMA, NMI, controle) e tabela de HDMA |
 | [teste-console.asm](references/teste-console.asm) | ROM de teste para medir no console real HDMA ligado no meio do quadro, CGRAM no hblank e force blank no meio da linha |
+| [teste-refresh.asm](references/teste-refresh.asm) | ROM de teste para medir no console real a posição do refresh da DRAM na linha, com o teste Lua do Mesen ao lado |
 | [fontes.md](references/fontes.md) | Fontes com URL, autor, ano e confiança; divergências; o que ficou não confirmado |
 
 ## Fora do escopo
