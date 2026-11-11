@@ -9,6 +9,7 @@
 - **snes-graficos**: tabela de variantes de LZSS com coluna de segunda fonte (ff5 e ff6 conferidos rodando contra o ff6tools, o resto marcado "uma fonte só"), linha do `wizardry6` corrigida (2048 bytes, 3 a 34, flags invertidas), cabeçalho de cada variante e a página em japonês do Okumura sobre o preenchimento do anel (#33).
 - **snes-rom-hack**: fontes em japonês (改造) procuradas de novo, com o que entrou, o que foi lido e o que foi descartado; mais quatro hacks grandes como referência (Super Metroid Map Rando, VARIA, Super Metroid Practice Hack e Combo Randomizer, só documentação e estrutura): mapa de espaço livre por banco, versão do asar fixada e patch gerado sem a ROM; conversão de LoROM em HiROM registrada como não confirmada (#29).
 - **snes-assembly**, **snes-rom-hack**, **snes-graficos**: binários rodados em 11/11/2026. WLA-DX v10.7 confirma MVN, pulo long, apelidos e `.ACCU 16`, e mostra que `COP` sem operando sai `00 02` (bug deles) (#25); flips v198 cria e aplica o BPS com a linha de comando do `build.py` (#29); `recomp.exe` do Lunar Compress confirma o fluxo do LC_LZ8 do sfc-comp, com cabeçalho de 2 bytes em vez de 8 (#33).
+- **snes-desmontagem**: conversor de CDL rodado de ponta a ponta (CDL salvo no MesenCE, convertido e importado no DiztinGUIsh 2.5.1.0, com M, X e dado certos) e condições do trace logger rodadas à mão; `frame >= 600` não gravou nada, condição inválida grava tudo sem mostrar aviso e cada CPU tem a própria condição (#31).
 
 ## v0.2
 
