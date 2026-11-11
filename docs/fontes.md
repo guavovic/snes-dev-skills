@@ -25,6 +25,7 @@ Documentos usados nas skills, com o que cada um cobre e o quanto é confiável. 
 | [Código do sd2snes / FXPAK](https://github.com/mrehkopf/sd2snes) | ikari_01 (mrehkopf) | Detecção de mapeamento no firmware, mapa de ROM e SRAM na FPGA | Alta pro que o código faz; sem teste em hardware |
 | [Lunar Expand](https://fusoya.eludevisibility.org/le/) | FuSoYa | Suporte a ExLoROM por versão do Snes9x e do ZSNES | Média-alta |
 | [Regras de envio do SMW Central](https://web.archive.org/web/20250725214811/https://www.smwcentral.net/?p=guidelines&page=1633980-all-hacks) | SMW Central | Formato e regras de envio de hack, lidos em cópia do Internet Archive | Alta |
+| [BizHawk](https://github.com/TASEmulators/BizHawk) | TASEmulators e colaboradores | Formato do arquivo CDL e flags do CDL de SNES, lidos no código | Alta |
 | [DiztinGUIsh](https://github.com/DizTools/DiztinGUIsh) | IsoFrieze, DizTools e colaboradores | Importadores do desmontador e formato do CDL do BizHawk, lidos no código | Alta |
 | [Capstone](https://github.com/capstone-engine/capstone) | equipe do Capstone | Desmontagem 65816 por script, modos de M e X, lida no código e rodada na 5.0.7 | Alta |
 | [sm_disassembly](https://github.com/InsaneFirebat/sm_disassembly) | InsaneFirebat | Organização da desmontagem do Super Metroid que monta no asar (só a estrutura) | Média |

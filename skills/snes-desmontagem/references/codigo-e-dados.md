@@ -14,13 +14,39 @@ Conferido no código do MesenCE [MesenCE src]:
 - O estado gravado é o de antes da instrução: o `REP #$20` executado com M=1 fica marcado com M=1 [MesenCE src][Teste local].
 - Arquivo `.cdl`: começa com o texto `CDLv2`, seguido do CRC32 da ROM em 4 bytes (cabeçalho de 9 bytes), depois um byte por byte de ROM. Arquivo antigo sem CRC carrega com aviso.
 - "Generate ROM" gera uma cópia da ROM tirando o que não foi usado ou o que foi usado. Útil para ver no visualizador quais regiões o jogo nunca tocou na sessão.
-- Pelo Lua, `emu.getCdlData(memType)` devolve as flags, o que permite exportar para outro formato com um script. Funciona dentro do `--testRunner`, sem janela: `emu.getCdlData(emu.memType.snesPrgRom)` num callback de `endFrame` devolveu as flags acima [Teste local]. O DiztinGUIsh não lê esse formato; ver [ferramentas.md](ferramentas.md).
+- Pelo Lua, `emu.getCdlData(memType)` devolve as flags, o que permite exportar para outro formato com um script. Funciona dentro do `--testRunner`, sem janela: `emu.getCdlData(emu.memType.snesPrgRom)` num callback de `endFrame` devolveu as flags acima [Teste local]. O DiztinGUIsh não lê esse formato; para levar o CDL até ele, ver a conversão logo abaixo.
 
 Como usar bem:
 
 1. Comece o CDL limpo (Reset) logo antes da parte que interessa, ou acumule várias sessões para cobrir o jogo inteiro.
 2. Passe por todos os caminhos: menus, mortes, fim de fase, opções. Rotina que não rodou não é marcada.
 3. Salve o `.cdl` junto do projeto (ele não contém a ROM, só flags e CRC) [MesenCE src].
+
+### Converter o CDL do Mesen para o DiztinGUIsh
+
+O DiztinGUIsh só importa o CDL do BizHawk (ver [ferramentas.md](ferramentas.md)). O script próprio `references/cdl_mesen_para_bizhawk.py` (Python 3, sem dependências, código original deste repositório) faz a conversão:
+
+```
+python cdl_mesen_para_bizhawk.py jogo.cdl jogo.sfc jogo-bizhawk.cdl
+```
+
+A ROM entra porque o CDL do Mesen só tem flags: o tamanho de cada instrução sai do byte do opcode na ROM e do M e do X gravados no CDL. Depois, no DiztinGUIsh, o arquivo gerado é importado como CDL do BizHawk.
+
+O que o script faz, com a fonte de cada regra:
+
+- **Lê o `.cdl` do Mesen**: com cabeçalho `CDLv2` e CRC32 (9 bytes) ou no formato antigo, sem cabeçalho, como o próprio Mesen aceita (`CodeDataLogger.cpp`) [MesenCE src]. Avisa quando o CRC32 da ROM não bate com o gravado. O Mesen calcula esse CRC sobre a PRG ROM já sem o cabeçalho de copiadora de 512 bytes (`SnesDebugger.cpp`, `BaseCartridge.cpp`), e o script também tira esse cabeçalho (tamanho com resto 512 na divisão por 1024) antes de comparar.
+- **Acha o começo de cada instrução** do mesmo jeito que o Mesen reconstrói a própria desmontagem a partir do CDL (`SnesCodeDataLogger::RebuildPrgCache`): percorre a ROM, e cada byte marcado como código que não está dentro da instrução anterior é um opcode. O tamanho vem do opcode e das flags `0x20` (M=1) e `0x10` (X=1) desse byte, pela tabela de modos de `SnesDisUtils.cpp` [MesenCE src]. A tabela do script foi conferida contra a do Mesen (os 256 opcodes, nos quatro estados de M e X) e, pelo teste automatizado, contra a coluna de bytes da tabela de opcodes da skill `snes-assembly` (`references/instrucoes.md`, montada no asar) [Teste local].
+- **Escreve as flags do BizHawk**: `0x01` no primeiro byte, junto com o M e o X (`0x20` e `0x10`), `0x02` nos bytes de operando e `0x04` no byte que o Mesen marcou como dado. São os valores do `eCDLog_Flags` do libsnes do BizHawk, que grava o M e o X só no primeiro byte (`op_readpcfirst`) [BizHawk src]; o importador do DiztinGUIsh lê o M e o X do primeiro byte e repete nos operandos [DiztinGUIsh src].
+- **Monta o arquivo** como o `CodeDataLog.Save` do BizHawk: string `BIZHAWK-CDL-2`, sistema `SNES` completado com espaços até 15 caracteres, quantidade de blocos e cada bloco com nome e tamanho. Strings no formato do `BinaryWriter` do .NET (tamanho em 7 bits por byte, depois UTF-8), inteiros de 32 bits little-endian [BizHawk src]. Só vai o bloco `CARTROM`, o único que o DiztinGUIsh usa [DiztinGUIsh src].
+
+O que se perde ou fica de fora:
+
+- Destino de salto (`0x04`) e entrada de sub-rotina (`0x08`) do Mesen não têm equivalente no CDL do BizHawk e são descartados [BizHawk src].
+- Byte com a marca do GSU (`0x40`) ou do Cx4 (`0x80`) não vira código do 65816: é código de outro processador, e o Mesen também o trata assim ao reconstruir a desmontagem [MesenCE src]. Se tiver a marca de dado, sai como dado.
+- O BizHawk não abre o arquivo gerado: ao carregar, ele exige os mesmos blocos que ele mesmo cria (`CARTROM-DB`, `WRAM`, `APURAM` e outros) [BizHawk src]. O arquivo é para o DiztinGUIsh.
+- **M e X misturados.** O Mesen junta as flags com OU a cada execução [MesenCE src]: um byte executado uma vez com M=1 e outra com M=0 fica com M=1, e o script decodifica como 8 bits. Quando isso faz o operando cair num byte que o Mesen não marcou como código, o script avisa (`byte(s) de operando sem a marca de código`). Nesse trecho, confira à mão no DiztinGUIsh.
+
+Testado com ROM e CDL sintéticos montados no próprio teste, sem ROM comercial: `python -m unittest test_cdl_mesen_para_bizhawk -v` nesta pasta (17 testes) [Teste local]. O teste lê o arquivo gerado com uma cópia em Python da lógica do importador do DiztinGUIsh (`BizHawkCdlImporter`), mas a abertura no programa de verdade ainda não foi feita (não confirmado).
 
 ## Usage map do bsnes-plus
 

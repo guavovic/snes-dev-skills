@@ -2,6 +2,7 @@
 
 ## [Não lançado]
 
+- **snes-desmontagem**: script `cdl_mesen_para_bizhawk.py` que converte o CDL do Mesen para o CDL do BizHawk que o DiztinGUIsh importa, decodificando o tamanho de cada instrução pelo M e X gravados, com testes em arquivos sintéticos; formatos conferidos no código do MesenCE, do BizHawk e do DiztinGUIsh (#31).
 - **snes-hardware**: references novos de chips de cartucho (SA-1, GSU, CX4, DSP-n, S-DD1, SPC7110: mapa, registradores e header, com o SA-1 rodado no Mesen) e de SPC700 e BRR (registradores do DSP, formato BRR e driver mínimo próprio conferido no estado do DSP do Mesen); offset-per-tile testado no Mesen; data do documento de timing do anomie achada (21/12/2008); ROM de teste pronta para medir no console real o HDMA no meio do quadro, a CGRAM no hblank e o force blank (#27).
 - **snes-tecnicas**: paleta de hora do dia e estação com caso documentado (Harvest Moon, pela desmontagem e pelo guia da reimplementação em C) e exemplo novo em asar, testado no Mesen, que leva a paleta até a alvo um passo por canal, em fatias por quadro.
 - **snes-assembly**, **snes-rom-hack**, **snes-tecnicas**, **snes-testes**: conta sem precedência do asar 1.x documentada como armadilha (`asar 1.90` com dois dígitos, define, divisão) e conferida em todos os blocos das sete skills; callback de memória do Mesen disparando nas escritas do DMA e do HDMA registrado como armadilha, com teste próprio (#37).
