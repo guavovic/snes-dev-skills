@@ -11,6 +11,7 @@
 - **snes-assembly**, **snes-rom-hack**, **snes-graficos**: binários rodados em 11/11/2026. WLA-DX v10.7 confirma MVN, pulo long, apelidos e `.ACCU 16`, e mostra que `COP` sem operando sai `00 02` (bug deles) (#25); flips v198 cria e aplica o BPS com a linha de comando do `build.py` (#29); `recomp.exe` do Lunar Compress confirma o fluxo do LC_LZ8 do sfc-comp, com cabeçalho de 2 bytes em vez de 8 (#33).
 - **snes-hardware**: ROM de teste pronta para medir no console real a posição do refresh da DRAM na linha, pelo contador H, com versão da CPU e das PPUs na tela; no MesenCE ela mostra 538 e 534 master clocks em linhas alternadas, igual ao código do Mesen, e o bsnes usa 530 ou 538 conforme a versão da CPU (#25).
 - **snes-desmontagem**: conversor de CDL rodado de ponta a ponta (CDL salvo no MesenCE, convertido e importado no DiztinGUIsh 2.5.1.0, com M, X e dado certos) e condições do trace logger rodadas à mão; `frame >= 600` não gravou nada, condição inválida grava tudo sem mostrar aviso e cada CPU tem a própria condição (#31).
+- **snes-rom-hack**: ROMs de teste prontas para medir no FXPAK e no Super EverDrive o mapa ExLoROM (8 e 6 MB) e a SRAM de LoROM acima de 32 KB (espelhos por banco, tamanho e contador de boot), com o resultado na tela; no MesenCE as duas batem com o mapa do próprio emulador (#29).
 
 ## v0.2
 

@@ -44,6 +44,8 @@ ROM hack é patch em cima de uma ROM que você não pode distribuir. O trabalho 
 | `references/patches-ips-bps.md` | Formato IPS e BPS byte a byte, flips na linha de comando, outras ferramentas |
 | `references/fluxo-git-e-build.md` | Projeto mínimo com asar (montado e rodado no Mesen): estrutura, `.gitignore`, script de build que confere o hash da ROM base, monta e gera o `.bps`; variante que gera o patch sem a ROM |
 | `references/comunidade.md` | Regras de envio do SMW Central, romhacking.net depois de 2024, etiqueta de distribuição, comunidade japonesa (改造), organização de cinco hacks grandes abertos (z3randomizer, Map Rando, VARIA, Practice Hack, Combo Randomizer) |
+| `references/teste-exlorom.asm`, `references/teste-exlorom.lua` | ROM de teste de ExLoROM pra flashcart: mostra na tela que bloco de 32 KB cada banco liga e se o mapa é ExLoROM ou LoROM; o Lua confere no Mesen |
+| `references/teste-sram.asm`, `references/teste-sram.lua` | ROM de teste de SRAM grande em LoROM pra flashcart: espelhos por banco, KB distintos e contador de boot na tela; o Lua confere no Mesen |
 | `references/fontes.md` | Fontes, confiança, divergências e o que não foi consultado |
 
 ## Relação com outras skills
