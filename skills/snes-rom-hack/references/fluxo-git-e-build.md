@@ -125,6 +125,23 @@ Uso: `python build.py C:\caminho\da\rom.sfc`. Precisa de `asar` e `flips` no PAT
 - **Teste em emulador de alta precisão** (bsnes, Mesen) e, se der, em flash cart; emulador permissivo esconde erro de mapeamento e de timing.
 - **Não versione `.srm`** (save) nem estado salvo.
 
+## Variante: patch sem a ROM, com dois arquivos de mentira
+
+Quando todo o código vai pra endereço fixo (`org`), dá pra gerar o patch sem a ROM original. É o que fazem o Super Metroid Practice Hack e o Combo Randomizer [SMPractice][SMZ3]:
+
+1. Crie dois arquivos do tamanho da ROM, um só com `$00` e outro só com `$FF`.
+2. Monte o mesmo `main.asm` nos dois, com `--no-title-check`.
+3. Compare byte a byte: onde os dois são iguais, o asar escreveu; onde diferem, ficou o enchimento. Grave só os iguais num IPS.
+
+O Map Rando e o VARIA também montam sem a ROM, mas com um arquivo só, pedindo o IPS direto ao asar (`--ips`) [MapRando][VARIA].
+
+Ressalvas, deduzidas do funcionamento do método e não testadas nesta rodada:
+
+- **Não combina com `freespace`/`freecode`.** A busca procura sequência de `freespacebyte`; no arquivo de `$FF` ela não acha o mesmo lugar que no de `$00`, ou não acha nada. Use `org` em faixa conhecida, como os projetos acima.
+- **Não combina com patch que lê a ROM** (`read1()` e parecidos): o valor lido é o enchimento, não o jogo.
+- **Desligue o recálculo do checksum** (`--fix-checksum=off`, como o Map Rando e o VARIA). Se o asar recalcular, os dois arquivos ganham checksums diferentes, e um byte que coincida por acaso entra no patch.
+- O resultado é IPS, com os limites do formato (`patches-ips-bps.md`). Pra distribuir em BPS, aplique o IPS na ROM limpa e gere o BPS com o flips a partir dela.
+
 ## O exemplo rodado de verdade
 
 Em 02/11/2026 o `main.asm` e o `hooks.asm` acima foram montados sem nenhuma mudança no asar 1.91, sobre uma ROM base própria (512 KB de zeros, com um RESET que grava `$42` em `$10` e pula pra `$8123`, onde estão os bytes `A5 10 8D 00 02` do comentário) [Teste local]:

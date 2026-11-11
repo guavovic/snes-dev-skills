@@ -42,8 +42,8 @@ ROM hack é patch em cima de uma ROM que você não pode distribuir. O trabalho 
 | `references/espaco-livre-e-hooks.md` | Achar espaço livre, RATS, anatomia de um hook com JSL, o que preservar, JML, trampolim, hook em vetor |
 | `references/asar.md` | Diretivas do asar pra hack: mapper, org, freespace/freecode/freedata, autoclean, prot, pushpc/pullpc, defines, macros, incsrc/incbin, check, avisos, linha de comando |
 | `references/patches-ips-bps.md` | Formato IPS e BPS byte a byte, flips na linha de comando, outras ferramentas |
-| `references/fluxo-git-e-build.md` | Projeto mínimo com asar (montado e rodado no Mesen): estrutura, `.gitignore`, script de build que confere o hash da ROM base, monta e gera o `.bps` |
-| `references/comunidade.md` | Regras de envio do SMW Central, romhacking.net depois de 2024, etiqueta de distribuição, organização de um hack grande aberto |
+| `references/fluxo-git-e-build.md` | Projeto mínimo com asar (montado e rodado no Mesen): estrutura, `.gitignore`, script de build que confere o hash da ROM base, monta e gera o `.bps`; variante que gera o patch sem a ROM |
+| `references/comunidade.md` | Regras de envio do SMW Central, romhacking.net depois de 2024, etiqueta de distribuição, comunidade japonesa (改造), organização de cinco hacks grandes abertos (z3randomizer, Map Rando, VARIA, Practice Hack, Combo Randomizer) |
 | `references/fontes.md` | Fontes, confiança, divergências e o que não foi consultado |
 
 ## Relação com outras skills
