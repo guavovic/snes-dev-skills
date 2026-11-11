@@ -91,7 +91,7 @@ O [sfc-comp] reimplementa dezenas de compressores de SNES e expõe os parâmetro
 | `ff6` | 2048 | 3 a 34 | empacota `posição \| (tamanho - 3) << 11`; anel zerado, primeira escrita em `0x7DE`; cabeçalho = tamanho **comprimido** (2 bytes, contando o próprio cabeçalho) | [ff6tools], conferido rodando (abaixo) |
 | `wizardry6` | 2048 | 3 a 34 | flags do bit 0 com sentido invertido (bit 0 = literal, bit 1 = referência); empacota `posição \| (tamanho - 3) << 11`, posição contada a partir do começo da janela de 2048 bytes que acaba no byte atual | uma fonte só |
 | `dq6` | 1024 | 3 a 66 | 6 bits de tamanho e 10 de posição (byte 2 = tamanho - 3 nos bits 0-5, posição bits 8-9 nos bits 6-7); primeira escrita em `0x3BE`; sem cabeçalho | uma fonte só |
-| `super_mario_rpg` (LC_LZ8) | 4095 | 3 a 18 | distância pra trás em vez de posição absoluta; cabeçalho de 8 bytes big endian (tamanho descomprimido e comprimido) | nome e uso confirmados no `LunarDLL.h` ("gráficos dos créditos"); parâmetros, uma fonte só (ver abaixo) |
+| `super_mario_rpg` (LC_LZ8) | 4095 | 3 a 18 | distância pra trás em vez de posição absoluta, flags a partir do bit 0 com 1 = literal, referência em 2 bytes little endian `distância bits 0-7`, `(tamanho - 3) \| distância bits 8-11 << 4`; cabeçalho diverge: o sfc-comp grava 8 bytes big endian (tamanho descomprimido e comprimido), o `recomp.exe` grava 2 bytes big endian com o tamanho comprimido sem contar o cabeçalho | nome e uso no `LunarDLL.h` ("gráficos dos créditos"); fluxo conferido rodando o `recomp.exe` (abaixo); cabeçalho do jogo não confirmado |
 | `rs3_comp_1` | 4095 | 3 a 18 | mesma distância pra trás do `super_mario_rpg`, com cabeçalho de 2 bytes (tamanho comprimido) | uma fonte só |
 | `dragon_knight_4` | 2048 | 2 a 33 | flags lidas a partir do bit 7, e bit 1 = referência; referência com 5 bits de tamanho, posição relativa ao fim da janela | uma fonte só |
 | `kiki_kaikai` | 2048 | 3 a 34 | flags de 16 bits, bit 1 = referência; empacota `(distância - 1) \| (tamanho - 3) << 11` | uma fonte só |
@@ -106,7 +106,11 @@ O [ff6tools] (editor aberto de Final Fantasy, GPL-3.0) tem compressor e descompr
 
 As duas fontes concordam em tudo o que a tabela diz pra `ff5` e `ff6`, inclusive a diferença do cabeçalho (tamanho descomprimido no ff5, comprimido no ff6).
 
-O mesmo teste com o `recomp.exe` do [Lunar Compress] (LC_LZ8 pro `super_mario_rpg`) não rodou: a execução do binário baixado foi barrada no ambiente do agente. Fica **não confirmado** até alguém rodar `recomp.exe amostra.bin saida.bin 0 1007 0` e descomprimir com o formato da tabela.
+### Conferência rodando: LC_LZ8
+
+Em 11/11/2026 o `recomp.exe` do [Lunar Compress] 2.00 (x64) comprimiu com `recomp.exe amostra.bin saida.bin 0 1007 0` (formato 7 = `LC_LZ8` no `LunarDLL.def`) um arquivo sintético de 956 bytes (valores aleatórios de 0 a 3, texto repetido, zeros e a sequência 0 a 255). A saída de 534 bytes foi descomprimida por um descompressor em Python escrito a partir do `super_mario_rpg_comp.cpp` e do `lzss.hpp` do sfc-comp e voltou igual byte a byte; trocar a ordem dos bits de flag, o sentido do bit ou a ordem dos bytes da referência quebra a leitura [Teste local: LC_LZ8].
+
+O fluxo de dados bate com o sfc-comp. O cabeçalho não: o `recomp.exe` começa com `02 14`, 532 em big endian, que é o tamanho comprimido sem os 2 bytes do cabeçalho, enquanto o sfc-comp grava 8 bytes (tamanho descomprimido e comprimido, 32 bits big endian cada). Qual dos dois o jogo espera só se confirma na rotina do jogo; antes de reinserir dado, confira os bytes que antecedem o bloco original na ROM.
 
 ## LC_LZ11 (LZSS de janela de 2 KB)
 

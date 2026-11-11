@@ -67,7 +67,7 @@ O NMI/IRQ pode entrar no meio de qualquer código. O tratador tem que salvar A, 
 
 WDC, ca65 e WLA-DX: `MVN origem,destino`. **asar: `MVN destino,origem`** [asar manual + `arch-65816.cpp`]. Copiar código entre montadores sem inverter troca origem e destino em silêncio. Os bytes de máquina são sempre `54 destino origem` [WDC][E&L].
 
-Conferido montando: no asar 1.91, `MVN $34,$12` gera `54 34 12`; no WLA-DX, o teste `all_instructions_test` do repositório espera `mvn $12,$34` = `54 34 12` [WLA-DX código]. O asar também aceita um operando só de 16 bits, no formato `$SSDD` (byte alto = origem): `MVN $7E7F` gera `54 7F 7E`, ou seja, origem $7E e destino $7F, ao contrário da forma com vírgula. Evite essa forma.
+Conferido montando: no asar 1.91, `MVN $34,$12` gera `54 34 12`; no WLA-DX v10.7, `mvn $12,$34` gera `54 34 12`, como o teste `all_instructions_test` do repositório espera [WLA-DX código][Teste local: WLA-DX]. O asar também aceita um operando só de 16 bits, no formato `$SSDD` (byte alto = origem): `MVN $7E7F` gera `54 7F 7E`, ou seja, origem $7E e destino $7F, ao contrário da forma com vírgula. Evite essa forma.
 
 ## 9. Page wrap do modo emulação
 
@@ -87,13 +87,13 @@ Só aparece no boot ou em código que volta pro modo emulação: com DL=$00, ins
 | Endereço do código | `org $008000` (endereço SNES; o mapeamento vem de `lorom`/`hirom`) | segmentos + arquivo de config do linker | `.BANK`/`.ORG`/`.SECTION` com `.MEMORYMAP` |
 | Patch sobre ROM existente | nativo: `org`, `freecode`, `autoclean`, `pushpc/pullpc` | não é o foco | não é o foco |
 
-Fontes: [asar] manual e `arch-65816.cpp`, coluna conferida montando no asar 1.91; [ca65] seções 65816, `.SMART`, `.A8/.A16`, prefixos de endereço; [WLA-DX] `asmsyntax.rst` e `asmdiv.rst`; [WLA-DX código] tabela de instruções `i65816.c` e testes `tests/65816` (lidos, não executados). Os apelidos `DEA INA SWA TAD TAS TDA TSA` vêm da tabela de apelidos de [E&L], que também lista `BLT`/`BGE` e `JMP` long como sinônimos de `BCC`/`BCS` e `JML`.
+Fontes: [asar] manual e `arch-65816.cpp`, coluna conferida montando no asar 1.91; [ca65] seções 65816, `.SMART`, `.A8/.A16`, prefixos de endereço; [WLA-DX] `asmsyntax.rst` e `asmdiv.rst`; [WLA-DX código] tabela de instruções `i65816.c` e testes `tests/65816`, com MVN, pulo long, apelidos e `.ACCU 16` montados no WLA-DX v10.7 [Teste local: WLA-DX]. Os apelidos `DEA INA SWA TAD TAS TDA TSA` vêm da tabela de apelidos de [E&L], que também lista `BLT`/`BGE` e `JMP` long como sinônimos de `BCC`/`BCS` e `JML`.
 
 Avisos do [ca65] que valem pra qualquer montador: `.smart` acompanha REP/SEP pela ordem do texto, não pelo fluxo de execução; depois de um desvio ou de uma sub-rotina o montador pode estar errado sobre M/X. Na dúvida, declare o tamanho.
 
 Erro da documentação do WLA-DX: o exemplo de `.ACCU 16` em `asmdiv.rst` mostra `AND #6` como `$29 $00 $06`, mas o código (`phase_4.c`) grava o imediato de 16 bits em little-endian, o que dá `$29 $06 $00` [WLA-DX código].
 
-Ainda sem confirmação: `COP` sem operando no WLA-DX. A tabela `i65816.c` guarda o valor $0200, que gravado em little-endian sairia `00 02` (opcode errado); o WLA-DX não foi executado aqui. Escreva sempre `COP $xx` com assinatura.
+Bug do WLA-DX: `COP` sem operando gera `00 02`, ou seja, um `BRK` seguido de `$02`, e não `02 00`. Conferido montando no WLA-DX v10.7 em 11/11/2026; a causa é o valor $0200 da tabela `i65816.c`, gravado em little-endian. O asar 1.91 gera `02 00`. Escreva sempre `COP $xx` com assinatura, que sai certo nos dois (`COP $12` = `02 12` no WLA-DX) [Teste local: WLA-DX].
 
 ## 11. Conta sem precedência no asar 1.x
 

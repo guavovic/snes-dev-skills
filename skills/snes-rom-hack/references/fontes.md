@@ -37,7 +37,7 @@ Pesquisa feita em 26/10/2026, revisada em 02/11/2026 (issue #13) e ampliada em 1
 - Fontes em japonês sobre ROM hacking de Super Famicom (改造): duas rodadas de busca (26/10 e 02/11/2026) só devolveram páginas em inglês. A terceira, em 11/11/2026, está na seção "Busca em japonês" abaixo.
 - Super EverDrive: firmware fechado e manual sem mapa de ExLoROM nem limite de SRAM; não confirmado.
 - Teste em hardware real (FXPAK, EverDrive, cartucho): não feito; o que está escrito do FXPAK é leitura do código [sd2snes].
-- flips: o download do binário foi barrado nesta rodada, então o passo de gerar o `.bps` do build de exemplo não foi rodado.
+- flips: em 11/11/2026 o Floating IPS v198 (`flips-windows.zip` da página de releases) rodou com a mesma linha de comando do `build.py` (`flips --create --bps limpa hack saida.bps`) sobre dois arquivos sintéticos de 1 KB, e `flips --apply` devolveu o arquivo modificado igual byte a byte (patch de 44 bytes). O `build.py` inteiro, com asar e Mesen, foi rodado antes, em 02/11/2026.
 - Hacks grandes: lidas a documentação e a estrutura do [z3randomizer], [MapRando], [VARIA], [SMPractice] e [SMZ3], sem código de jogo. Nenhum deles foi montado nem rodado aqui (seria preciso baixar o asar de cada um e a ROM original); o método de IPS com dois arquivos de mentira está descrito pela leitura dos scripts, e as ressalvas em `fluxo-git-e-build.md` são dedução, sem teste.
 - Detalhe de instrução e ciclos: delegado à skill `snes-assembly`; mapa de memória e registradores: `snes-hardware`.
 

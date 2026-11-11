@@ -151,4 +151,4 @@ Em 02/11/2026 o `main.asm` e o `hooks.asm` acima foram montados sem nenhuma muda
 - `--symbols=wla` gerou o `hack.sym`.
 - No Mesen 2.2.1 com `--testRunner`, um script Lua leu a WRAM no décimo quadro: na ROM base, `$7E:1F00` tinha lixo de power-on e `$0200` = `$42`; no hack, `$7E:1F00` = `$01` e `$0200` = `$42`. O hook rodou e as instruções refeitas também.
 
-O passo do flips não foi rodado: o download do binário foi barrado nesta rodada, então o `build.py` ainda para nesse passo se o `flips` não estiver no PATH. A linha de comando segue o README do [flips].
+O passo do flips foi conferido em 11/11/2026: o Floating IPS v198 rodou a mesma linha de comando (`flips --create --bps limpa hack saida.bps`) sobre arquivos sintéticos e `flips --apply` devolveu o arquivo modificado igual byte a byte. O `build.py` para nesse passo se o `flips` não estiver no PATH.
