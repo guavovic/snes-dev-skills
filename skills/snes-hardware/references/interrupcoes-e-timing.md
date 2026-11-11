@@ -14,7 +14,7 @@ Fontes: [fullsnes: Timings] [SNESdev wiki: Timing] [anomie timing]. H é medido 
 - CPU: cada acesso leva 6, 8 ou 12 master clocks (3,58 / 2,68 / 1,79 MHz), conforme a região do mapa (ver [mapa-de-memoria.md](mapa-de-memoria.md)).
 - Linha normal: 1364 master clocks = 340 dots (341 posições, com 4 dots "longos" de 5 clocks).
 - Exceções: em NTSC sem interlace, a linha 240 do campo ímpar tem 1360 clocks; em PAL com interlace, a linha 311 do campo ímpar tem 1368 [fullsnes] [SNESdev wiki].
-- Refresh da DRAM: a CPU para 40 master clocks por linha, perto de H = 133 [fullsnes] [anomie timing].
+- Refresh da DRAM: a CPU para 40 master clocks por linha, perto de H = 133 [fullsnes] [anomie timing]. O ponto exato muda entre emuladores: o bsnes usa o master clock 530 da linha na CPU versão 1 e 538 - (contador de clocks AND 7) na versão 2 [bsnes]; o MesenCE usa sempre 538 - (master clock no começo da linha AND 7), o que dá 538 e 534 em linhas alternadas, porque 1364 não é múltiplo de 8 [Mesen2]. A ROM [teste-refresh.asm](teste-refresh.asm) mede esse ponto pelo contador H; no MesenCE 2.2.1 ela mostrou 538 nas linhas pares e 534 nas ímpares (H = 134 e 133), igual ao valor que o Mesen usou em cada linha, com CPU versão 2 [Teste local]. **O console real ainda não foi medido**: a ROM mostra o resultado na tela para fotografar.
 - Interlace soma uma linha nos quadros alternados.
 
 ## Linha do tempo de um quadro (NTSC, 224 linhas)
